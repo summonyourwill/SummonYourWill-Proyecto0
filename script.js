@@ -315,7 +315,6 @@ const AUTOCLICK_ENERGY_COST = 20;         // % per cycle
 const REST_INTERVAL_MS = 60_000;          // 1 minute
 const REST_ENERGY_GAIN = 10;              // % per cycle
 const HEROES_PER_PAGE = 8;
-const VILLAINS_PER_PAGE = 8;
 const PETS_PER_PAGE = 8;
 const FAMILIAR_COUNT = 100;
 const HABILITY_COUNT = 100;
@@ -393,10 +392,6 @@ const CHIEF_MAX_PAGES = 25;
 const PARTNER_ITEMS_PER_PAGE = 4;
 const PARTNER_MAX_PAGES = 25;
 let MAX_PETS = 5;
-let MAX_VILLAINS = 3;
-export function incrementMaxVillains(delta = 1) {
-  MAX_VILLAINS += delta;
-}
 let profilePublic = false;
 export { MAX_PETS };
 const BUILDING_IMAGES = {
@@ -472,12 +467,6 @@ let heroFilterFavorites = false;
 let heroFilterReady = false;
 let heroFilterSex = null;
 let heroFilterSearch = null;
-let currentVillainPage = 1;
-let villainSort = "floor";
-let villainSortAsc = true;
-let villainFilterOrigin = null;
-let villainFilterFavorites = false;
-let villainFilterSearch = null;
 let currentPetPage = 1;
 let petSort = "name";
 let petSortAsc = true;
@@ -488,7 +477,6 @@ let MAX_LEVEL = 10;
 let CHIEF_MAX_LEVEL = 20;
 let PARTNER_MAX_LEVEL = 20;
 let castleLevelFixApplied = false;
-let villainCapFixApplied = false;
 let MAX_STATS = {
   fuerza: 5,
   destreza: 5,
@@ -669,7 +657,6 @@ if (!window.hasOwnProperty('villageChief')) {
     configurable: true
   });
 }
-let villains = [];
 let partner = {
   name: "Partner",
   img: "",
@@ -692,7 +679,6 @@ if (!window.hasOwnProperty('partner')) {
   });
 }
 let currentPetHero = null;
-let nextVillainFloor = 1;
 const UPGRADE_TIME = 180; // 3 minutes
 // La inicialización de state.upgradeTasks y state.buildingLevels se hará en initializeStateData()
 
@@ -810,14 +796,8 @@ function migrateSave(data) {
       data.buildingLevels.PetSanctuary = psLvl;
     }
   }
-  if (data.MAX_VILLAINS !== undefined) {
-    const towerLvl = data.MAX_VILLAINS - 3;
-    if (towerLvl > 0 && (data.buildingLevels.Tower || 0) < towerLvl) {
-      data.buildingLevels.Tower = towerLvl;
-    }
-  }
-  if (data.buildingLevels.Tower === undefined || data.buildingLevels.Tower < 3) {
-    data.buildingLevels.Tower = 3;
+  if (data.buildingLevels.Tower === undefined) {
+    data.buildingLevels.Tower = 0;
   }
   if (!Array.isArray(data.projects)) data.projects = [];
   if (data.projectPoints === undefined) data.projectPoints = 0;
@@ -846,7 +826,6 @@ async function loadGame() {
     return;
   }
   castleLevelFixApplied = data.castleLevelFixApplied ?? false;
-  villainCapFixApplied = data.villainCapFixApplied ?? false;
   try {
     localStorage.setItem('syw_points', String(data.projectPoints || 0));
     localStorage.setItem('syw_projects_v1', JSON.stringify(data.projects || []));
@@ -1141,12 +1120,6 @@ async function loadGame() {
   // if (partner.energyPotions === undefined) partner.energyPotions = 0;
   // if (partner.expPotions === undefined) partner.expPotions = 0;
   // if (partner.energia === undefined) partner.energia = 100;
-  villains = data.villains ?? villains;
-  villains.forEach(v => {
-    if (v.avatarOffset === undefined) v.avatarOffset = 50;
-    if (v.favorite === undefined) v.favorite = false;
-  });
-  nextVillainFloor = data.nextVillainFloor ?? nextVillainFloor;
   state.autoClickActive = data.autoClickActive ?? state.autoClickActive;
   fortuneDay = data.fortuneDay ?? fortuneDay;
   fortuneLastPrize = data.fortuneLastPrize ?? fortuneLastPrize;
@@ -1196,16 +1169,6 @@ async function loadGame() {
     }
   });
   MAX_PETS = data.MAX_PETS ?? MAX_PETS;
-  MAX_VILLAINS = data.MAX_VILLAINS ?? MAX_VILLAINS;
-  let villainFixNeeded = false;
-  if (!villainCapFixApplied) {
-    const towerLvl = state.buildingLevels.Tower || 0;
-    if (MAX_VILLAINS !== towerLvl) {
-      MAX_VILLAINS = towerLvl;
-      villainFixNeeded = true;
-    }
-    villainCapFixApplied = true;
-  }
   setMaxFood(data.MAX_FOOD ?? MAX_FOOD);
   setMaxWood(data.MAX_WOOD ?? MAX_WOOD);
   setMaxStone(data.MAX_STONE ?? MAX_STONE);
@@ -1234,10 +1197,6 @@ async function loadGame() {
   // if (data.PARTNER_MAX_STATS) {
   //   Object.assign(PARTNER_MAX_STATS, data.PARTNER_MAX_STATS);
   // }
-  if (villainFixNeeded) {
-    updateResourcesDisplay();
-    scheduleSaveGame();
-  }
   if (!castleLevelFixApplied) {
     updateMaxLevelsFromCastle();
     castleLevelFixApplied = true;
@@ -2007,10 +1966,7 @@ export function saveGame() {
     farmers: state.farmers,
     lumberjacks: state.lumberjacks,
     miners: state.miners,
-    villains,
-    nextVillainFloor,
     MAX_PETS,
-    MAX_VILLAINS,
     MAX_FOOD,
     MAX_WOOD,
     MAX_STONE,
@@ -2019,7 +1975,6 @@ export function saveGame() {
     MAX_STATS,
     CHIEF_MAX_STATS,
     castleLevelFixApplied,
-    villainCapFixApplied,
     autoClickActive: state.autoClickActive,
     bossRushDay,
     bossRushCount,
@@ -2162,7 +2117,6 @@ function importSave() {
         renderMissions();
         renderPetManagement();
         renderGames();
-        renderVillains();
         renderTutorial();
         renderSettings();
         saveGame();
@@ -2186,8 +2140,6 @@ function getImportAlertContainer() {
       return document.getElementById('daily-missions-card') || document.getElementById('missions-section');
     case 'pets':
       return document.getElementById('pet-management-section');
-    case 'villains':
-      return document.getElementById('villain-section');
     default:
       return null;
   }
@@ -2249,8 +2201,6 @@ function updateResourcesDisplay() {
     const totalPets = state.heroes.filter(h => h.pet).length;
     petsTitle.textContent = `My Pets (${totalPets}/${MAX_PETS})`;
   }
-  const vilTitle = document.querySelector("#villain-section h1");
-  if (vilTitle) vilTitle.textContent = `My Villains (${villains.length}/${MAX_VILLAINS})`;
   const sbtn = document.getElementById("summon-btn");
   if (sbtn) {
     sbtn.textContent = `HeroSummon (${summonCost} Gold)`;
@@ -2373,40 +2323,6 @@ function updateHeroControls() {
   if (removeBtn) removeBtn.style.display = (heroFilterOrigin || heroFilterProfession || heroFilterSex || heroFilterSearch) ? "inline-block" : "none";
 }
 
-function updateVillainControls() {
-  const originSel = document.getElementById("villain-origin-filter");
-  const favCheck = document.getElementById("villain-favorite-check");
-  const searchInput = document.getElementById("villain-search");
-  const searchList = document.getElementById("villain-search-list");
-  if (!originSel) return;
-  const origins = [...new Set(villains.map(v => v.origin || "No origin"))].sort((a,b)=>a.localeCompare(b));
-  const currentOrigin = villainFilterOrigin || "";
-  originSel.innerHTML = "<option value=''>Filter by origin</option>";
-  origins.forEach(o => {
-    const opt = document.createElement("option");
-    opt.value = o;
-    opt.textContent = o;
-    originSel.appendChild(opt);
-  });
-  originSel.value = currentOrigin;
-  originSel.onmousedown = pauseTimersBriefly;
-  if (favCheck) {
-    favCheck.checked = villainFilterFavorites;
-    favCheck.disabled = false;
-  }
-  if (searchInput && searchList) {
-    searchInput.value = villainFilterSearch || "";
-    const q = searchInput.value.toLowerCase();
-    const names = [...new Set(villains.map(v => v.name || "").filter(n => n.toLowerCase().includes(q)))]
-      .sort((a,b)=>a.localeCompare(b));
-    searchList.innerHTML = names.map(n => `<option value="${n}"></option>`).join("");
-    searchInput.disabled = false;
-  }
-  const remove = document.getElementById("villain-remove-filter-btn");
-  if (remove) remove.style.display = (villainFilterOrigin || villainFilterSearch) ? "inline-block" : "none";
-  originSel.disabled = false;
-}
-
 function updatePetControls() {
   const originSel = document.getElementById("pet-origin-filter");
   const favCheck = document.getElementById("pet-favorite-check");
@@ -2489,31 +2405,6 @@ function addPetExp(hero, amount, maxLevel = MAX_LEVEL) {
   }
 }
 
-
-function createVillain(name, origin = "No origin", avatar = "") {
-  const id = villains.length ? Math.max(...villains.map(v => v.id)) + 1 : 1;
-  const floor = villains.length + 1;
-  nextVillainFloor = floor + 1;
-  return { id, name, origin, avatar, avatarOffset: 50, floor, desc: "", favorite: false };
-}
-
-function getNextVillainName() {
-  let i = 1;
-  while (villains.some(v => v.name.toLowerCase() === `enemy ${i}` || v.name.toLowerCase() === `enemy${i}`)) {
-    i++;
-  }
-  return `Enemy ${i}`;
-}
-
-function ensureUniqueVillainName(base, excludeId = null) {
-  let name = base;
-  let i = 2;
-  while (villains.some(v => v.id !== excludeId && v.name.toLowerCase() === name.toLowerCase())) {
-    name = `${base} ${i}`;
-    i++;
-  }
-  return name;
-}
 
 function ensureUniqueFamiliarName(list, base) {
   let name = base;
@@ -2691,10 +2582,6 @@ function collectOrigins(items, key) {
 
 function getHeroOrigins() {
   return collectOrigins(state.heroes, 'origin');
-}
-
-function getVillainOrigins() {
-  return collectOrigins(villains, 'origin');
 }
 
 function getPetOrigins() {
@@ -3629,7 +3516,7 @@ function enemyEncounterAvailable() {
     enemyDay = getToday();
     enemyCount = 0;
   }
-  return enemyCount < 5 && villains.length < MAX_VILLAINS;
+  return enemyCount < 5;
 }
 
 function chiefSurvivalAvailable() {
@@ -5968,7 +5855,6 @@ function showChiefExtra(label, onClose) {
       text.style.paddingBottom = "15px"; // Agregar padding bottom
       let html =
         `${dailyTributeInfo.claimedToday ? "Claimed" : "Claim your daily tribute"}:<br>` +
-        `• 300 Gold for each Villain in your village (Total: ${dailyTributeInfo.goldFromVillains} Gold)<br>` +
         `• 250 Gold for each Hero (Total: ${dailyTributeInfo.goldFromHeroes} Gold)<br>` +
         `• 200 Gold for each Pet (Total: ${dailyTributeInfo.goldFromPets} Gold)<br>` +
         `• 100 Gold per Dungeon level (Total: ${dailyTributeInfo.goldFromDungeons} Gold)<br>` +
@@ -6042,23 +5928,6 @@ export function showVillageExtra(label, onClose) {
 
 }
 
-function setVillainSectionVisible(show, afterHeroes = false) {
-  const vilSec = document.getElementById("villain-section");
-  const heroSec = document.getElementById("heroes-section");
-  const petSec = document.getElementById("pets-section");
-  if (!vilSec || !heroSec) return;
-  if (show) {
-    if (afterHeroes && petSec) {
-      petSec.insertAdjacentElement('afterend', vilSec);
-    } else {
-      heroSec.parentNode.insertBefore(vilSec, heroSec);
-    }
-    vilSec.style.display = "block";
-  } else {
-    vilSec.style.display = "none";
-  }
-}
-
 function closeAllPanels() {
   document.querySelectorAll('.stats.expand-row').forEach(el => el.classList.remove('expand-row'));
   openStats = {};
@@ -6114,7 +5983,6 @@ function showDailyTribute() {
     showChiefExtra("DailyTribute");
     return;
   }
-  const villainsCount = villains.length;
   const familiarCount = unlockedFamiliars;
   const familiarLevels = villageChief.familiars
     .slice(0, familiarCount)
@@ -6123,12 +5991,11 @@ function showDailyTribute() {
   const petCount = state.heroes.filter(h => h.pet).length;
   const dungeonLevel = state.buildingLevels?.Dungeons || 0;
   const partnerLevel = partner.level || 0;
-  const goldFromVillains = villainsCount * 300;
   const goldFromFamiliars = familiarCount * 500 + familiarLevels * 50;
   const goldFromHeroes = heroCount * 250;
   const goldFromPets = petCount * 200;
   const goldFromDungeons = dungeonLevel * 100;
-  const totalGold = goldFromVillains + goldFromFamiliars + goldFromHeroes + goldFromPets + goldFromDungeons;
+  const totalGold = goldFromFamiliars + goldFromHeroes + goldFromPets + goldFromDungeons;
   const potionTypes = ["Health", "Mana", "Energy", "Experience"];
   const chosenPotions = [];
   for (let i = 0; i < partnerLevel; i++) {
@@ -6150,7 +6017,6 @@ function showDailyTribute() {
     ? potionSummaryParts.slice(0, -1).join(' ') + ' y ' + potionSummaryParts.slice(-1)
     : (potionSummaryParts[0] || '');
   villageChief.dailyTributeRewards = {
-    goldFromVillains,
     goldFromFamiliars,
     goldFromHeroes,
     goldFromPets,
@@ -6173,7 +6039,6 @@ function showDailyTribute() {
   dailyTributeInfo = {
     partnerLevel,
     potionSummary,
-    goldFromVillains,
     goldFromFamiliars,
     goldFromHeroes,
     goldFromPets,
@@ -6202,7 +6067,6 @@ function showView(view = "home") {
     specialBuilder: document.getElementById("special-builder-assignment"),
     games: document.getElementById("games-section"),
     missions: document.getElementById("missions-section"),
-    villains: document.getElementById("villain-section"),
     pets: document.getElementById("pets-section"),
     petManagement: document.getElementById("pet-management-section"),
     heroes: document.getElementById("heroes-section"),
@@ -6236,9 +6100,6 @@ function showView(view = "home") {
     if (shareWrap) shareWrap.style.display = "flex";
     if (sections.heroes && sections.pets) {
       sections.pets.parentNode.insertBefore(sections.heroes, sections.pets);
-    }
-    if (sections.villains && sections.pets) {
-      sections.pets.insertAdjacentElement('afterend', sections.villains);
     }
   } else {
     if (exportBtnEl) exportBtnEl.style.display = "inline-block";
@@ -6311,13 +6172,6 @@ function showView(view = "home") {
   } else {
     if (sections.terrain) sections.terrain.style.display = "none";
     if (sections.specialBuilder) sections.specialBuilder.style.display = "none";
-  }
-
-  if (view === "villains" || view === "profiles") {
-    setVillainSectionVisible(true, view === "profiles");
-    if (view === "profiles") setupVillainEventListeners();
-  } else {
-    setVillainSectionVisible(false);
   }
 
   if ((view === "pets" || view === "profiles") && sections.pets) {
@@ -7451,8 +7305,6 @@ function enemySetup(card, container = card, showVillains = true) {
     overlay.style.paddingTop = `${title.offsetTop}px`;
   }
 
-  if (showVillains) setVillainSectionVisible(true);
-
   const nameInput = document.createElement("input");
   nameInput.type = "text";
   nameInput.placeholder = "Enemy Name";
@@ -7461,9 +7313,9 @@ function enemySetup(card, container = card, showVillains = true) {
   originInput.type = "text";
   originInput.placeholder = "Origin";
   const originList = document.createElement('datalist');
-  const originListId = `villain-origin-${Date.now()}`;
+  const originListId = `enemy-origin-${Date.now()}`;
   originList.id = originListId;
-  getVillainOrigins().forEach(o => {
+  getHeroOrigins().forEach(o => {
     const opt = document.createElement('option');
     opt.value = o;
     originList.appendChild(opt);
@@ -7516,13 +7368,12 @@ function enemySetup(card, container = card, showVillains = true) {
     const heroId = parseInt(heroSelect.value);
     if (!heroId) return;
     const hero = state.heroMap.get(heroId);
-    let name = nameInput.value.trim();
-    if (!name) name = getNextVillainName();
-    name = ensureUniqueVillainName(name);
+    const name = nameInput.value.trim() || "Enemy";
     const origin = originInput.value.trim() || "No origin";
     const avatar = avatarData;
     removeOverlay(overlay);
-    startEnemyGame(card, hero, createVillain(name, origin, avatar));
+    const tempEnemy = { name, origin, avatar, avatarOffset: 50 };
+    startEnemyGame(card, hero, tempEnemy);
   };
 
   const cancel = document.createElement("button");
@@ -7534,7 +7385,6 @@ function enemySetup(card, container = card, showVillains = true) {
     card.innerHTML = "";
     state.buildSelectionOpen = false;
     showView(currentView);
-    if (showVillains) setVillainSectionVisible(true);
     renderGames();
   };
 
@@ -7582,7 +7432,6 @@ function enemySetup(card, container = card, showVillains = true) {
     card.innerHTML = "";
     card.style.display = "none";
     globalState.buildSelectionOpen = false;
-    renderVillains();
     scheduleRenderHeroes();
     renderGames();
     updateResourcesDisplay();
@@ -7823,7 +7672,6 @@ function enemySetup(card, container = card, showVillains = true) {
       endTimer = 0;
       running = false;
       stopLoop();
-        villains.push(villain);
         addHeroExp(hero, XP_REWARD);
         enemyCount++;
         globalState.money += goldReward;
@@ -7837,7 +7685,6 @@ function enemySetup(card, container = card, showVillains = true) {
       card.innerHTML = "";
       card.style.display = "none";
       globalState.buildSelectionOpen = false;
-      renderVillains();
       scheduleRenderHeroes();
       renderGames();
       updateResourcesDisplay();
@@ -9045,9 +8892,6 @@ export function getUpgradeRequirements(label) {
   if (label === 'PetSanctuary') {
     const inferred = (MAX_PETS ?? 5) - 5;
     if (lvl < inferred) lvl = inferred;
-  } else if (label === 'Tower') {
-    const inferred = (MAX_VILLAINS ?? 3) - 3;
-    if (lvl < inferred) lvl = inferred;
   }
   let cost;
   let energy = 30;
@@ -9596,7 +9440,6 @@ function completeUpgrade(label) {
     const b = document.getElementById('btn-Quarry');
     if (b) { b.disabled = false; b.style.background = ''; b.title = getUpgradeTooltip('Quarry'); }
   }
-  if (label === 'Tower') MAX_VILLAINS += 1;
   if (label === 'Castle') {
     updateMaxLevelsFromCastle();
   }
@@ -9829,7 +9672,6 @@ function applyHiddenTime(seconds) {
           const b = document.getElementById('btn-Quarry');
           if (b) { b.disabled = false; b.style.background = ''; b.title = getUpgradeTooltip('Quarry'); }
         }
-        if (label === 'Tower') MAX_VILLAINS += 1;
         if (label === 'Castle') {
           updateMaxLevelsFromCastle();
         }
@@ -11286,220 +11128,6 @@ export function renderHeroes() {
   }
 }
 
-function renderVillains() {
-  const container = document.getElementById("villains");
-  const pagination = document.getElementById("villain-pagination");
-  if (!container) return;
-  container.innerHTML = "";
-  if (pagination) pagination.innerHTML = "";
-  const readOnly = currentView === "profiles";
-
-  let list = villains.slice();
-  if (villainFilterOrigin) {
-    list = list.filter(v => v.origin === villainFilterOrigin);
-  }
-  if (villainFilterFavorites) {
-    list = list.filter(v => v.favorite);
-  }
-  if (villainFilterSearch) {
-    const q = villainFilterSearch.toLowerCase();
-    list = list.filter(v => (v.name || "").toLowerCase().includes(q));
-  }
-  const sorted = list.sort((a, b) => {
-    if (villainSort === "floor") return (a.floor || 0) - (b.floor || 0);
-    return villainSortAsc
-      ? a.name.localeCompare(b.name)
-      : b.name.localeCompare(a.name);
-  });
-  const villainPages = Math.max(1, Math.ceil(sorted.length / VILLAINS_PER_PAGE));
-  if (currentVillainPage > villainPages) currentVillainPage = villainPages;
-  const start = (currentVillainPage - 1) * VILLAINS_PER_PAGE;
-  const pageList = sorted.slice(start, start + VILLAINS_PER_PAGE);
-
-  pageList.forEach(vil => {
-    const div = document.createElement("div");
-    div.className = "hero";
-
-    const star = document.createElement("div");
-    star.className = "favorite-star" + (vil.favorite ? " selected" : "");
-    star.textContent = "★";
-    star.style.cursor = readOnly ? "default" : "pointer";
-    if (!readOnly) {
-      star.onclick = () => {
-        vil.favorite = !vil.favorite;
-        saveGame();
-        renderVillains();
-      };
-    }
-    div.appendChild(star);
-
-    const avatarWrap = document.createElement("div");
-    avatarWrap.className = "avatar-wrap image-wrapper villain-image villain-image-container";
-    const avatar = document.createElement("img");
-    avatar.src = vil.avatar || EMPTY_SRC;
-    avatar.className = "avatar";
-    avatar.style.objectPosition = `center ${vil.avatarOffset ?? 50}%`;
-    if (!vil.avatar) avatar.classList.add("empty");
-    avatarWrap.appendChild(avatar);
-    const vDl = document.createElement('div');
-    vDl.className = 'download-icon';
-    vDl.textContent = '🡇';
-    vDl.classList.toggle('disabled', !vil.avatar);
-    vDl.title = 'Download image';
-    vDl.setAttribute('aria-label', 'Download image');
-    vDl.onclick = e => {
-      e.stopPropagation();
-      if (vDl.classList.contains('disabled')) return;
-      downloadImage(avatar.src);
-    };
-    avatarWrap.appendChild(vDl);
-
-    if (!readOnly) {
-      avatar.title = "Edit Image (160x200 recommended)";
-      avatar.onclick = () => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.style.display = "none";
-        input.onchange = e => {
-          const file = e.target.files[0];
-          if (!file) return;
-          resizeImageToBase64(file, 160, 200, resized => {
-            vil.avatar = resized;
-            saveGame();
-            renderVillains();
-          });
-        };
-        input.click();
-      };
-    }
-
-    const info = document.createElement("div");
-    info.className = "info-section";
-
-    const nameSpan = document.createElement("strong");
-    nameSpan.textContent = vil.name;
-    nameSpan.title = "Edit Name";
-    nameSpan.style.cursor = "pointer";
-    nameSpan.onclick = () => {
-      openEditModal("Name", vil.name, nuevo => {
-        if (nuevo) {
-          vil.name = ensureUniqueVillainName(nuevo, vil.id);
-          saveGame();
-          renderVillains();
-        }
-      }, { container: div });
-    };
-    info.appendChild(nameSpan);
-    info.appendChild(document.createElement("br"));
-    const originSpan = document.createElement("span");
-    originSpan.textContent = `Origin: ${vil.origin || "No origin"}`;
-    originSpan.title = "Edit Origin";
-    originSpan.style.cursor = "pointer";
-    originSpan.onclick = () => {
-      openEditModal("Origin", vil.origin, nuevo => {
-        if (nuevo !== null) {
-          vil.origin = nuevo || "No origin";
-          saveGame();
-          renderVillains();
-          updateVillainControls();
-        }
-      }, { container: div, suggestions: getVillainOrigins() });
-    };
-    info.appendChild(originSpan);
-    info.insertAdjacentHTML("beforeend", `<br>Floor: ${vil.floor}`);
-    const vDescSpan = document.createElement('span');
-    vDescSpan.textContent = vil.desc ? (vil.desc.length>60 ? vil.desc.slice(0,60)+'...' : vil.desc) : 'Empty';
-    vDescSpan.style.cursor = 'pointer';
-    vDescSpan.onclick = () => {
-      openEditModal('Villain Description', vil.desc, val => {
-        vil.desc = val;
-        saveGame();
-        renderVillains();
-      }, {multiLine:true, container: div});
-    };
-    const vDescLine = document.createElement('div');
-    vDescLine.style.fontSize = '0.85em';
-    vDescLine.classList.add('desc-preview');
-    vDescLine.append('Description: ');
-    vDescLine.appendChild(vDescSpan);
-    info.appendChild(vDescLine);
-
-    const actionBlock = document.createElement("div");
-    actionBlock.className = "action-block";
-    const statsBtn = document.createElement("button");
-    statsBtn.className = "btn btn-green";
-    statsBtn.textContent = "Stats";
-    statsBtn.style.width = "110px";
-    statsBtn.onclick = () => {
-      document.getElementById(`vil-stats-${vil.id}`).classList.add("expand-row");
-    };
-    actionBlock.appendChild(statsBtn);
-
-    const delBtn = document.createElement("button");
-    delBtn.className = "btn btn-green";
-    delBtn.textContent = "Delete";
-    delBtn.style.background = "#dc3545";
-    delBtn.style.width = "110px";
-    delBtn.style.marginTop = "6px";
-    delBtn.onclick = () => {
-      openConfirm({
-        message: "Are you sure you want to delete this villain?",
-        onConfirm: () => {
-          const idx = villains.findIndex(v => v.id === vil.id);
-          if (idx !== -1) {
-            villains.splice(idx, 1);
-            villains.forEach((v, i) => (v.floor = i + 1));
-            nextVillainFloor = villains.length + 1;
-            saveGame();
-            updateResourcesDisplay();
-            updateVillainControls();
-            renderVillains();
-            renderGames();
-          }
-        },
-        container: div
-      });
-    };
-    actionBlock.appendChild(delBtn);
-    div.appendChild(avatarWrap);
-    div.appendChild(info);
-    div.appendChild(actionBlock);
-
-    const statsDiv = document.createElement("div");
-    statsDiv.className = "stats";
-    statsDiv.id = `vil-stats-${vil.id}`;
-    const closeBtn = document.createElement("button");
-    closeBtn.textContent = "❌";
-    closeBtn.className = "close-btn";
-    closeBtn.onclick = () => {
-      statsDiv.classList.remove("expand-row");
-    };
-    statsDiv.appendChild(closeBtn);
-    const hp = document.createElement("div");
-    hp.textContent = "HP : 1";
-    statsDiv.appendChild(hp);
-    div.appendChild(statsDiv);
-
-    container.appendChild(div);
-  });
-
-  if (pagination) {
-    const prev = document.createElement("button");
-    prev.textContent = "Prev";
-    prev.disabled = currentVillainPage === 1;
-    prev.onclick = () => { if (currentVillainPage > 1) { currentVillainPage--; renderVillains(); } };
-    const info = document.createElement("span");
-    info.textContent = ` Page ${currentVillainPage} of ${villainPages} `;
-    const next = document.createElement("button");
-    next.textContent = "Next";
-    next.disabled = currentVillainPage === villainPages;
-    next.onclick = () => { if (currentVillainPage < villainPages) { currentVillainPage++; renderVillains(); } };
-    pagination.appendChild(prev);
-    pagination.appendChild(info);
-    pagination.appendChild(next);
-  }
-}
-
 function renderPets() {
   const container = document.getElementById("pets");
   const pagination = document.getElementById("pet-pagination");
@@ -12065,7 +11693,6 @@ function preloadCommonImages() {
     if (h.petImg) urls.push(h.petImg);
   });
   if (villageChief.avatar) urls.push(villageChief.avatar);
-  villains.forEach(v => { if (v.avatar) urls.push(v.avatar); });
   commonAssetsLoaded = true;
   preloadAssets(urls);
 }
@@ -12199,7 +11826,7 @@ Houses: Increase max Heroes (1 Hero per House).
 
 Pet Sanctuary: Increases max Pets.
 
-Tower: Increases max Villains you can hold.
+Tower: Village defense structure.
 
 Food/Wood/Stone Storage: Raise caps for Food, Wood, Stone.
 
@@ -12268,7 +11895,7 @@ Use Village Chief and Partner abilities to repel intruders and earn Gold.
 6 Heroes fight a giant monster that gets stronger after each defeat.
 
 <strong>5.3 Enemy Encounters</strong>
-Capture-style minigame that adds Villains to the village.
+Capture-style minigame for hero XP and rewards.
 
 <strong>5.4 Pet Exploration</strong>
 Each Pet can collect Gold once per day with the Village Chief and Partner.
@@ -12435,7 +12062,6 @@ async function exportAllImages() {
 
       if (h.pet && h.petImg) add('Pets', `${sanitizeFileName(h.pet)}-${HERO}`, h.petImg);
     });
-    (villains || []).forEach(v => add('Villains', v.name, v.avatar));
     console.table(items.map(x => ({
       subdir: x.subdir,
       filename: x.filename,
@@ -12771,7 +12397,7 @@ function renderGames() {
       if (label === "GiantBoss") {
         info.textContent = bossRushAvailable() ? `${5 - bossRushCount} chances left` : "Come back tomorrow";
       } else if (label === "EnemyEncounter") {
-        info.textContent = enemyEncounterAvailable() ? `${5 - enemyCount} chances left` : (villains.length >= MAX_VILLAINS ? "Villain limit reached" : "Come back tomorrow");
+        info.textContent = enemyEncounterAvailable() ? `${5 - enemyCount} chances left` : "Come back tomorrow";
       } else if (label === "ChiefSurvival") {
         info.textContent = chiefSurvivalAvailable() ? `${5 - chiefSurvivalWins} chances left` : "Come back tomorrow";
       }
@@ -13851,72 +13477,6 @@ function checkAllMissions() {
 
 // checkAllMissions se ejecutará después de inicializar el estado
 
-function setupVillainEventListeners() {
-  const villainSearchInput = document.getElementById("villain-search");
-  if (villainSearchInput) {
-    villainSearchInput.oninput = e => {
-      const q = e.target.value.toLowerCase();
-      const list = document.getElementById("villain-search-list");
-      if (list) {
-        const names = [...new Set(villains.map(v => v.name || "").filter(n => n.toLowerCase().includes(q)))]
-          .sort((a,b)=>a.localeCompare(b));
-        list.innerHTML = names.map(n => `<option value="${n}"></option>`).join("");
-      }
-    };
-    const applyVillainSearch = () => {
-      villainFilterSearch = villainSearchInput.value.trim() || null;
-      currentVillainPage = 1;
-      renderVillains();
-      updateVillainControls();
-    };
-    villainSearchInput.addEventListener('change', applyVillainSearch);
-    villainSearchInput.addEventListener('keydown', e => { if (e.key === 'Enter') applyVillainSearch(); });
-  }
-
-  const vilSortNameBtn = document.getElementById("villain-sort-name-btn");
-  if (vilSortNameBtn) vilSortNameBtn.onclick = () => {
-    if (villainSort === "name") {
-      villainSortAsc = !villainSortAsc;
-    } else {
-      villainSort = "name";
-      villainSortAsc = true;
-    }
-    currentVillainPage = 1;
-    renderVillains();
-  };
-  const vilSortFloorBtn = document.getElementById("villain-sort-floor-btn");
-  if (vilSortFloorBtn) vilSortFloorBtn.onclick = () => {
-    villainSort = "floor";
-    currentVillainPage = 1;
-    renderVillains();
-  };
-  const vilOriginSel = document.getElementById("villain-origin-filter");
-  if (vilOriginSel) vilOriginSel.onchange = e => {
-    villainFilterOrigin = e.target.value || null;
-    currentVillainPage = 1;
-    renderVillains();
-    updateVillainControls();
-  };
-  const vilFavCheck = document.getElementById("villain-favorite-check");
-  if (vilFavCheck) vilFavCheck.onchange = e => {
-    if (currentView === "profiles") return;
-    villainFilterFavorites = e.target.checked;
-    currentVillainPage = 1;
-    renderVillains();
-    updateVillainControls();
-  };
-  const vilRemoveFilterBtn = document.getElementById("villain-remove-filter-btn");
-  if (vilRemoveFilterBtn) vilRemoveFilterBtn.onclick = () => {
-    villainFilterOrigin = null;
-    villainFilterSearch = null;
-    villainSort = "floor";
-    villainSortAsc = true;
-    currentVillainPage = 1;
-    renderVillains();
-    updateVillainControls();
-  };
-}
-
 function setupPetEventListeners() {
   const petSearchInput = document.getElementById("pet-search");
   if (petSearchInput) {
@@ -14026,7 +13586,6 @@ async function init() {
   tickGroupMissions(); // Verificar estado de misiones al cargar
   renderPetManagement();
   renderGames();
-  renderVillains();
   renderTutorial();
   renderSettings();
 
@@ -14066,13 +13625,11 @@ async function init() {
   }
 
   updateHeroControls();
-  updateVillainControls();
   updatePetControls();
   showView("home");
 
   // Los event listeners de héroes se asignan dinámicamente cuando se crean los controles
 
-  setupVillainEventListeners();
   setupPetEventListeners();
 
   const exportBtn = document.getElementById("export-btn");
@@ -14225,7 +13782,6 @@ const api = {
   resumeMission,
   resumeAllActivities,
   renderHeroes,
-  renderVillains,
   renderPets,
   startMission,
   renderMissions,
@@ -14233,11 +13789,8 @@ const api = {
   renderPetManagement,
   renderGames,
   summonHero,
-  createVillain,
-  ensureUniqueVillainName,
   showAlert,
   showBossStats,
-  setVillainSectionVisible,
   food: state.food,
   wood: state.wood,
   stone: state.stone,
@@ -14256,7 +13809,6 @@ const api = {
   downloadImage,
   terrain: state.terrain,
   MAX_PETS,
-  MAX_VILLAINS,
   MAX_TERRAIN: state.MAX_TERRAIN,
   MAX_LEVEL,
   CHIEF_MAX_LEVEL,
@@ -14267,7 +13819,6 @@ const api = {
   formatMissionTime,
   removeTimer,
   updateMaxLevelsFromCastle,
-  incrementMaxVillains,
     GAME_SOURCES,
     GAME_ASSETS,
     preloadMinigameAssets,
@@ -14292,32 +13843,25 @@ function updatePopulationInfo() {
   if (!populationInfo) return;
   
   const heroesCount = state.heroes.length;
-  const villainsCount = villains.length;
   const petsCount = state.heroes.filter(h => h.pet).length;
   
   populationInfo.innerHTML = `
     <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
       <span style="color: #2563eb;">Heroes: ${heroesCount}</span> | 
-      <span style="color: #dc2626;">Villains: ${villainsCount}</span> | 
       <span style="color: #16a34a;">Pets: ${petsCount}</span>
     </div>
     <div style="font-size: 14px; color: #666;">
-      Click on the buttons below to view Heroes, Villains, or Pets.
+      Click on the buttons below to view Heroes or Pets.
     </div>
   `;
 }
 
 function initPopulationView() {
   // Guardar clones de las secciones originales
-  if (!populationSectionsClones.villains) {
-    const villainsSection = document.getElementById("villain-section");
+  if (!populationSectionsClones.pets) {
     const petsSection = document.getElementById("pets-section");
     const petManagementSection = document.getElementById("pet-management-section");
     
-    if (villainsSection) {
-      populationSectionsClones.villains = villainsSection.cloneNode(true);
-      populationOriginalParents.villains = villainsSection.parentNode;
-    }
     if (petsSection) {
       populationSectionsClones.pets = petsSection.cloneNode(true);
       populationOriginalParents.pets = petsSection.parentNode;
@@ -14788,16 +14332,6 @@ function showPopulationTab(tab) {
     setTimeout(() => {
       scheduleRenderHeroes();
     }, 0);
-  } else if (tab === "villains") {
-    // Usar clon fresco de la sección original
-    if (populationSectionsClones.villains) {
-      const freshVillainsSection = populationSectionsClones.villains.cloneNode(true);
-      populationContent.appendChild(freshVillainsSection);
-      freshVillainsSection.style.display = "block";
-      setVillainSectionVisible(true, false);
-    }
-    // Re-asignar event listeners después de clonar
-    setupVillainEventListeners();
   } else if (tab === "pets") {
     // Usar clones frescos de las secciones originales
     if (populationSectionsClones.petManagement) {
@@ -14829,12 +14363,6 @@ function restorePopulationSectionsToOriginal() {
   currentPopulationTab = null;
   
   // Restaurar las secciones originales a sus padres
-  if (populationOriginalParents.villains && populationSectionsClones.villains) {
-    const originalVillains = populationOriginalParents.villains.querySelector('#villain-section');
-    if (!originalVillains) {
-      populationOriginalParents.villains.appendChild(populationSectionsClones.villains.cloneNode(true));
-    }
-  }
   if (populationOriginalParents.pets && populationSectionsClones.pets) {
     const originalPets = populationOriginalParents.pets.querySelector('#pets-section');
     if (!originalPets) {
@@ -15260,7 +14788,6 @@ function renderSpecialUnitsView(container) {
   
   const familiars = state.familiars ? state.familiars.length : 0;
   const heroes = state.heroes ? state.heroes.filter(h => h.type === 'hero').length : 0;
-  const villains = state.villains ? state.villains.length : 0;
   const pets = state.pets ? state.pets.length : 0;
   
   const stats = [
@@ -15268,7 +14795,6 @@ function renderSpecialUnitsView(container) {
     { label: 'Soldiers', value: `${soldiers}/${state.terrain * 50}`, icon: '⚔️', id: 'soldiers-display' },
     { label: 'Familiars', value: `${familiars}/100`, icon: '🐾', id: 'familiars-display' },
     { label: 'Heroes', value: `${heroes}`, icon: '🦸', id: 'heroes-total-display' },
-    { label: 'Villains', value: `${villains}`, icon: '👹', id: 'villains-total-display' },
     { label: 'Pets', value: `${pets}`, icon: '🐕', id: 'pets-total-display' },
     { label: 'Elites', value: `${window.Elites.length}`, icon: '👑', id: 'elites-display' },
     { label: 'SpecialCitizens', value: `${window.SpecialCitizens.length}`, icon: '🏛️', id: 'special-citizens-display' },

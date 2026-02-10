@@ -449,9 +449,6 @@ export function levelUp(buildingName) {
       if (buildingName === 'Castle' && m.updateMaxLevelsFromCastle) {
         m.updateMaxLevelsFromCastle();
       }
-      if (buildingName === 'Tower' && m.incrementMaxVillains) {
-        m.incrementMaxVillains();
-      }
       if (m.updateResourcesDisplay) m.updateResourcesDisplay();
     })
     .catch(() => {});

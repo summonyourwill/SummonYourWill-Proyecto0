@@ -14,10 +14,6 @@ export async function savePets(pets: any[]) {
   await persist.write('pets', pets);
 }
 
-export async function saveVillains(villains: any[]) {
-  await persist.write('villains', villains);
-}
-
 export async function saveFamiliars(familiars: any[]) {
   await persist.write('familiars', familiars);
 }

@@ -222,7 +222,6 @@ body.loading .content section {
 }
 
 .hero-card,
-.villain-card,
 .pet-card,
 .ability-card,
 .card {
@@ -421,17 +420,8 @@ body.loading .content section {
   gap: 10px;
 }
 
-#villains {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
   @media (max-width: 600px) {
     #pets {
-      grid-template-columns: 1fr;
-    }
-    #villains {
       grid-template-columns: 1fr;
     }
   }
@@ -630,7 +620,6 @@ body.loading .content section {
   width: 100%;
 }
 .hero-actions .btn,
-#villains .btn,
 #pets .btn {
 }
 
@@ -1492,7 +1481,6 @@ div#upgrade-timer-Hospital.timer {
 }
 
 .hero-image-container img,
-.villain-image-container img,
 .pet-image-container img,
 .ability-slot img {
   border: 5px solid var(--yellow-500);
@@ -2101,10 +2089,6 @@ section h1::before {
   content: "🧙";
 }
 
-#villain-section h1::before {
-  content: "👹";
-}
-
 #pets-section h1::before {
   content: "🐾";
 }
@@ -2188,8 +2172,7 @@ section h1::before {
 .hero-image-container .download-icon,
 .hero-second-image .download-icon,
 .ability-image-1 .download-icon,
-.ability-image-2 .download-icon,
-.villain-image-container .download-icon {
+.ability-image-2 .download-icon {
   left: 4px !important;
   top: 4px !important;
 }
@@ -2205,8 +2188,7 @@ section h1::before {
 .hero-image-container .zoom-icon,
 .hero-second-image .zoom-icon,
 .ability-image-1 .zoom-icon,
-.ability-image-2 .zoom-icon,
-.villain-image-container .zoom-icon {
+.ability-image-2 .zoom-icon {
   display: none !important;
 }
 
@@ -2295,8 +2277,7 @@ section h1::before {
   border-radius: 5px;
 }
 .hero-controls button,
-#pet-controls button,
-#villain-controls button {
+#pet-controls button {
   color: #fff;
   white-space: nowrap;
 }

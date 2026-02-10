@@ -197,28 +197,6 @@ async function generatePetsFile(heroes, chiefId) {
   }
 }
 
-// Función para generar archivo villains.json
-async function generateVillainsFile(villains, chiefId) {
-  try {
-    const villainsForJson = villains.map(villain => {
-      const { id, ...villainWithoutId } = villain; // Remover id del juego
-      return {
-        ...villainWithoutId,
-        chief_id: chiefId // ID numérico del village chief
-      };
-    });
-    
-    const villainsPath = path.join(SAVE_DIR, 'villains.json');
-    await fs.writeFile(villainsPath, JSON.stringify(villainsForJson, null, 2), 'utf-8');
-    logger.info('✅ Archivo villains.json generado en:', villainsPath);
-    
-    return villainsForJson;
-  } catch (error) {
-    logger.error('❌ Error al generar villains.json:', error);
-    return villains;
-  }
-}
-
 // Función para generar archivo villagechief.json (sin abilities)
 async function generateVillageChiefFile(villageChief, bossStats) {
   try {
@@ -521,10 +499,6 @@ async function saveGame(data) {
       if (data.heroes.some(h => h && h.pet && String(h.pet).trim() !== '')) {
         await generatePetsFile(data.heroes, chiefId);
       }
-    }
-    
-    if (data.villains && Array.isArray(data.villains)) {
-      await generateVillainsFile(data.villains, chiefId);
     }
     
     // Generar partner.json y partner_abilities.json
