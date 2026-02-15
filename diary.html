@@ -522,16 +522,18 @@
         .diary-images-container {
             display: flex;
             gap: 12px;
-            flex-wrap: wrap;
+            justify-content: space-between;
             margin-bottom: 15px;
             min-height: 0;
+            width: 100%;
         }
 
         .diary-image-wrap {
             position: relative;
-            flex-shrink: 0;
-            width: 120px;
-            height: 120px;
+            flex: 1;
+            min-width: 180px;
+            aspect-ratio: 1;
+            max-width: 320px;
             border: 2px solid var(--color-border);
             border-radius: 5px;
             overflow: hidden;
