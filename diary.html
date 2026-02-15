@@ -517,6 +517,60 @@
             transform: none;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        /* --- Diary images (top of entry) --- */
+        .diary-images-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            min-height: 0;
+        }
+
+        .diary-image-wrap {
+            position: relative;
+            flex-shrink: 0;
+            width: 120px;
+            height: 120px;
+            border: 2px solid var(--color-border);
+            border-radius: 5px;
+            overflow: hidden;
+            background: #e3d8c1;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25);
+        }
+
+        .diary-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+
+        .diary-image-wrap .diary-image-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(180, 0, 0, 0.9);
+            color: white;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            z-index: 2;
+            transition: background 0.2s;
+        }
+
+        .diary-image-wrap .diary-image-remove:hover {
+            background: rgba(220, 0, 0, 1);
+        }
     </style>
 </head>
 <body>
@@ -530,6 +584,7 @@
             <div class="date-navigation">
                 <button id="prevDay" class="nav-button">◀️ Previous Day</button>
                 <h2 id="currentDate" class="date-script"></h2>
+                <button id="addImageBtn" class="nav-button" title="Add up to 3 images">🖼️ Add Image</button>
                 <button id="nextDay" class="nav-button">Next Day ▶️</button>
             </div>
         </header>
@@ -572,6 +627,11 @@
                 </div>
             </div>
         </div>
+
+        <!-- Diary images (max 3), above the text editor -->
+        <div id="diaryImagesContainer" class="diary-images-container"></div>
+        <input type="file" id="diaryImageInput" accept="image/*" style="display: none;">
+        <input type="file" id="diaryImageReplaceInput" accept="image/*" style="display: none;">
 
         <div id="editor" class="editor-area" contenteditable="true" data-placeholder="Write your daily chronicles here...">
         </div>
@@ -644,6 +704,10 @@
         const emojiBtn = document.getElementById('emojiBtn');
         const toolbarEmojiPickerWrap = document.getElementById('toolbarEmojiPickerWrap');
         const toolbarEmojiPicker = document.getElementById('toolbarEmojiPicker');
+        const addImageBtn = document.getElementById('addImageBtn');
+        const diaryImagesContainer = document.getElementById('diaryImagesContainer');
+        const diaryImageInput = document.getElementById('diaryImageInput');
+        const diaryImageReplaceInput = document.getElementById('diaryImageReplaceInput');
 
         // State variable for current displayed date (initialized to today)
         let currentDate = new Date();
@@ -651,6 +715,8 @@
 
         // Maximum number of recent colors to display
         const MAX_RECENT_COLORS = 8;
+        // Maximum images per diary entry
+        const MAX_DIARY_IMAGES = 3;
 
         // Preset color palette (2 columns layout)
         const presetColors = [
@@ -689,6 +755,71 @@
         }
 
         /**
+         * Key for storing images for a diary date.
+         */
+        function getImagesKey(date) {
+            return `diary_images_${date.toISOString().split('T')[0]}`;
+        }
+
+        /**
+         * Load images array for a date from localStorage.
+         */
+        function loadImages(date) {
+            const key = getImagesKey(date);
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : [];
+        }
+
+        /**
+         * Save images array for current date.
+         */
+        function saveImages(date, images) {
+            localStorage.setItem(getImagesKey(date), JSON.stringify(images));
+        }
+
+        /**
+         * Render the diary images container for the current date.
+         */
+        function renderDiaryImages() {
+            const images = loadImages(currentDate);
+            diaryImagesContainer.innerHTML = '';
+
+            images.forEach((dataUrl, index) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'diary-image-wrap';
+
+                const img = document.createElement('img');
+                img.src = dataUrl;
+                img.alt = 'Diary image';
+                img.title = 'Click to change image';
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'diary-image-remove';
+                removeBtn.innerHTML = '×';
+                removeBtn.title = 'Remove image';
+                removeBtn.type = 'button';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const list = loadImages(currentDate);
+                    list.splice(index, 1);
+                    saveImages(currentDate, list);
+                    renderDiaryImages();
+                });
+
+                img.addEventListener('click', () => {
+                    diaryImageReplaceInput.dataset.replaceIndex = String(index);
+                    diaryImageReplaceInput.click();
+                });
+
+                wrap.appendChild(img);
+                wrap.appendChild(removeBtn);
+                diaryImagesContainer.appendChild(wrap);
+            });
+
+            addImageBtn.disabled = images.length >= MAX_DIARY_IMAGES;
+        }
+
+        /**
          * Updates the DOM with the current date and loads saved content.
          */
         function updateDiaryView() {
@@ -699,6 +830,7 @@
             const content = localStorage.getItem(key) || ''; // Load content or empty
 
             editorEl.innerHTML = content;
+            renderDiaryImages();
             // This ensures the Next Day button is disabled if it's today
             checkNextDayButton();
         }
@@ -1000,6 +1132,60 @@
         // 2. Event Listeners for navigation
         prevDayBtn.addEventListener('click', goToPreviousDay);
         nextDayBtn.addEventListener('click', goToNextDay);
+
+        // Add Image button: open file picker (max 3 images)
+        addImageBtn.addEventListener('click', () => {
+            const images = loadImages(currentDate);
+            if (images.length < MAX_DIARY_IMAGES) {
+                diaryImageReplaceInput.removeAttribute('data-replace-index');
+                diaryImageInput.click();
+            }
+        });
+
+        diaryImageInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                const images = loadImages(currentDate);
+                if (images.length < MAX_DIARY_IMAGES) {
+                    images.push(reader.result);
+                    saveImages(currentDate, images);
+                    renderDiaryImages();
+                }
+                e.target.value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        diaryImageReplaceInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                e.target.value = '';
+                return;
+            }
+            const replaceIndex = e.target.dataset.replaceIndex;
+            if (replaceIndex === undefined) {
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                const images = loadImages(currentDate);
+                const idx = parseInt(replaceIndex, 10);
+                if (idx >= 0 && idx < images.length) {
+                    images[idx] = reader.result;
+                    saveImages(currentDate, images);
+                    renderDiaryImages();
+                }
+                e.target.value = '';
+                delete e.target.dataset.replaceIndex;
+            };
+            reader.readAsDataURL(file);
+        });
 
         // 3. Event Listeners for toolbar
         boldBtn.addEventListener('click', () => formatText('bold'));
