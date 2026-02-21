@@ -171,6 +171,146 @@
         align-items: center;
       }
     }
+
+    /* Heroes Circles Styles */
+    .familiar-with-heroes {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      position: relative;
+    }
+
+    .hero-circles {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hero-circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.4);
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .hero-circle:hover {
+      transform: scale(1.1);
+      border-color: rgba(255,255,255,0.8);
+    }
+
+    .hero-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Custom Tooltip */
+    .hero-tooltip {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+      min-width: 200px;
+    }
+
+    .hero-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #2c3e50;
+    }
+
+    .hero-circle:hover .hero-tooltip {
+      opacity: 1;
+    }
+
+    .tooltip-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .tooltip-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .tooltip-name {
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .tooltip-level {
+      background: rgba(52, 152, 219, 0.8);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      margin-left: auto;
+    }
+
+    .tooltip-exp {
+      font-size: 0.75rem;
+      color: #bdc3c7;
+      margin-bottom: 8px;
+    }
+
+    .tooltip-abilities {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ability-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+
+    @media (max-width: 600px) {
+      .familiar-with-heroes {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .hero-circles {
+        flex-direction: row;
+        gap: 10px;
+      }
+      
+      .hero-circle {
+        width: 40px;
+        height: 40px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -188,6 +328,7 @@
 
     <div id="benefits" class="benefits"></div>
 
+
     <div class="main-area">
       <div class="breath-circle" id="circle">
         <div id="stepLabel">Inhale</div>
@@ -196,7 +337,10 @@
 
       <div class="familiar-container">
         <div class="familiar-name" id="familiarName">FamiliarName</div>
-        <div class="familiar-box" id="familiar">Your Familiar 🐾</div>
+        <div class="familiar-with-heroes">
+          <div class="familiar-box" id="familiar">Your Familiar 🐾</div>
+          <div class="hero-circles" id="heroCircles"></div>
+        </div>
         <div class="familiar-lvl" id="familiarLvl">Lvl: 1</div>
       </div>
     </div>
@@ -222,12 +366,102 @@
     famImg.onload = () => { familiarBox.innerHTML = ''; familiarBox.appendChild(famImg); };
     famImg.onerror = () => { famImg.src = DEFAULT_IMG; };
     famImg.src = DEFAULT_IMG;
+    // Heroes display functions
+    function createHeroCircle(hero) {
+      const circle = document.createElement('div');
+      circle.className = 'hero-circle';
+      
+      const avatar = document.createElement('img');
+      avatar.src = hero.avatar || '../Population/DefaultAvatar.png';
+      avatar.onerror = () => avatar.src = '../Population/DefaultAvatar.png';
+      
+      // Crear tooltip por defecto con formato: [Nombre] Lvl: X [ability1] [ability2]
+      let tooltipText = `${hero.name} Lvl: ${hero.level}`;
+      
+      // Agregar abilities solo si no están vacías
+      const abilities = [];
+      if (hero.ability1 && hero.ability1.trim() !== "") {
+        abilities.push(hero.ability1);
+      }
+      if (hero.ability2 && hero.ability2.trim() !== "") {
+        abilities.push(hero.ability2);
+      }
+      
+      if (abilities.length > 0) {
+        tooltipText += ' [' + abilities.join('] [') + ']';
+      }
+      
+      circle.title = tooltipText;
+      
+      // Configurar ciclo de imágenes
+      const availableImages = [];
+      
+      // Imagen principal (avatar)
+      if (hero.avatar) {
+        availableImages.push({ src: hero.avatar, name: 'Avatar' });
+      } else {
+        availableImages.push({ src: '../Population/DefaultAvatar.png', name: 'Avatar' });
+      }
+      
+      // Segunda imagen
+      if (hero.secondImg) {
+        availableImages.push({ src: hero.secondImg, name: '2nd Image' });
+      }
+      
+      // Ability 1 imagen
+      if (hero.ability1Img) {
+        availableImages.push({ src: hero.ability1Img, name: 'Ability 1' });
+      }
+      
+      // Ability 2 imagen
+      if (hero.ability2Img) {
+        availableImages.push({ src: hero.ability2Img, name: 'Ability 2' });
+      }
+      
+      // Configurar índice actual y evento de clic
+      circle.currentImageIndex = 0;
+      circle.availableImages = availableImages;
+      
+      circle.addEventListener('click', function() {
+        if (this.availableImages.length > 1) {
+          this.currentImageIndex = (this.currentImageIndex + 1) % this.availableImages.length;
+          const newImage = this.availableImages[this.currentImageIndex];
+          avatar.src = newImage.src;
+          avatar.onerror = () => avatar.src = '../Population/DefaultAvatar.png';
+          console.log(`Cambiando a: ${newImage.name}`);
+        }
+      });
+      
+      circle.appendChild(avatar);
+      
+      return circle;
+    }
+
+    function displayHeroes(heroes) {
+      const heroCircles = document.getElementById('heroCircles');
+      
+      if (!heroes || heroes.length === 0) {
+        heroCircles.style.display = 'none';
+        return;
+      }
+      
+      heroCircles.innerHTML = '';
+      heroes.forEach(hero => {
+        const heroCircle = createHeroCircle(hero);
+        heroCircles.appendChild(heroCircle);
+      });
+      
+      heroCircles.style.display = 'flex';
+    }
+
     window.addEventListener('message', e => {
       const data = e.data;
       if (data && data.type === 'familiarData') {
         if (data.name) familiarName.textContent = data.name;
         if (data.level) familiarLvl.textContent = `Lvl: ${data.level}`;
         if (data.img) famImg.src = data.img;
+      } else if (data && data.type === 'heroesData') {
+        displayHeroes(data.heroes);
       }
     });
 

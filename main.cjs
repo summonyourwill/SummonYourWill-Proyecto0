@@ -328,6 +328,48 @@ ipcMain.handle('export-all-images', async (_event, items = []) => {
   return baseDir;
 });
 
+// Handler para seleccionar imágenes del diario
+ipcMain.handle('diary:select-images', async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    filters: [
+      { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'] }
+    ],
+    properties: ['openFile']
+  });
+  return canceled ? null : filePaths[0];
+});
+
+// Handler para guardar imagen en el directorio del diario
+ipcMain.handle('diary:save-image', async (_event, { sourceFile, date, imageIndex }) => {
+  const picturesDir = app.getPath('pictures');
+  const diaryDir = path.join(picturesDir, 'SummonYourWillImages', 'Diary');
+  await fsp.mkdir(diaryDir, { recursive: true });
+  
+  const dateStr = date.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD format
+  const day = dateStr.slice(6, 8);
+  const month = dateStr.slice(4, 6);  
+  const year = dateStr.slice(0, 4);
+  const formattedDate = `${day}${month}${year}`;
+  
+  const ext = path.extname(sourceFile);
+  const fileName = `${formattedDate}_${imageIndex}${ext}`;
+  const destPath = path.join(diaryDir, fileName);
+  
+  await fsp.copyFile(sourceFile, destPath);
+  return destPath;
+});
+
+// Handler para eliminar imagen del diario
+ipcMain.handle('diary:delete-image', async (_event, imagePath) => {
+  try {
+    await fsp.unlink(imagePath);
+    return true;
+  } catch (err) {
+    console.warn('Failed to delete diary image:', err);
+    return false;
+  }
+});
+
 ipcMain.handle('music:list', async () => {
   return visibleIndex();
 });

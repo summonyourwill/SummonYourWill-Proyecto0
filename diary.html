@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Daily Codex - Medieval Journal</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Text:wght@400;600;700&family=Cardo:wght@400;700&family=Cormorant+Garamond:wght@400;600&family=IM+Fell+English+SC&family=Special+Elite&display=swap" rel="stylesheet">
-    <script type="module" src="https://unpkg.com/emoji-picker-element@^1/index.js"></script>
+    <script type="module" src="assets/js/emoji-picker-element/index.js"></script>
     <style>
         /* ================================== */
         /* STYLES (CSS)                       */
@@ -103,6 +103,32 @@
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
+        }
+
+        /* --- Calendar Button --- */
+
+        .calendar-btn {
+            background-color: var(--color-copper);
+            color: white;
+            border: 2px solid var(--color-border);
+            padding: 8px 12px;
+            cursor: pointer;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2em;
+            border-radius: 50%;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+            margin-left: 15px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-btn:hover {
+            background-color: #d4a06b;
+            transform: translateY(-1px) scale(1.05);
         }
 
         /* --- Toolbar --- */
@@ -423,8 +449,11 @@
             border: 1px solid #c9b08a;
             border-radius: 8px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            z-index: 9999;
-            position: fixed;
+            z-index: 99999;
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            transform: none !important;
         }
 
         .popover.hidden {
@@ -469,6 +498,8 @@
         /* Styles for Today I Learned text */
         .learned-today {
             display: block;
+            width: 100%;
+            box-sizing: border-box;
             margin: 10px 0;
             padding: 10px;
             background-color: #fffacd; /* A subtle yellow, like an illuminator highlight */
@@ -477,6 +508,37 @@
             font-style: italic;
             color: var(--color-ink);
             border-radius: 2px;
+            position: relative;
+            clear: both; /* Asegura que ocupe toda la fila */
+        }
+
+        /* Botón de eliminación para Today I Learned */
+        .learned-today-delete {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .learned-today:hover .learned-today-delete {
+            opacity: 1;
+        }
+
+        .learned-today-delete:hover {
+            background: rgba(255, 0, 0, 0.8);
+            transform: scale(1.1);
         }
 
         /* --- Footer --- */
@@ -518,6 +580,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
+<<<<<<< HEAD
         /* --- Diary images (top of entry) --- */
         .diary-images-container {
             display: flex;
@@ -572,21 +635,482 @@
 
         .diary-image-wrap .diary-image-remove:hover {
             background: rgba(220, 0, 0, 1);
+=======
+        /* --- Botón de Motivation (celeste con letras azules) --- */
+        .motivation-btn {
+            background: linear-gradient(145deg, #87ceeb, #b0e0e6);
+            color: #0066cc;
+            border: 2px solid #4682b4;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .motivation-btn:hover {
+            background: linear-gradient(145deg, #b0e0e6, #87ceeb);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .motivation-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Botón de Image (verde claro con letras verde oscuro) --- */
+        .image-btn {
+            background: linear-gradient(145deg, #98fb98, #90ee90);
+            color: #006400;
+            border: 2px solid #228b22;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .image-btn:hover {
+            background: linear-gradient(145deg, #90ee90, #98fb98);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Contenedor de imágenes del diario --- */
+        .diary-images {
+            margin: 20px 0;
+        }
+
+        .diary-images-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Tamaño fijo para todas las imágenes (igual que cuando hay 3) */
+        .diary-images-row .diary-image {
+            width: 250px;
+            height: 250px;
+        }
+
+        .diary-image {
+            position: relative;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .diary-image:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .diary-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+
+        .diary-image-delete {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+
+        .diary-image:hover .diary-image-delete {
+            opacity: 1;
+        }
+
+        .diary-image-delete:hover {
+            background: rgba(255, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        /* --- Modal para límite de imágenes --- */
+        .image-limit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-limit-modal.active {
+            display: flex;
+        }
+
+        .image-limit-content {
+            background-color: var(--color-parchment);
+            border: 3px solid var(--color-border);
+            border-radius: 5px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .image-limit-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.5em;
+            color: var(--color-dark-ink);
+            margin-bottom: 15px;
+        }
+
+        .image-limit-message {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1em;
+            color: var(--color-ink);
+            margin-bottom: 20px;
+        }
+
+        /* === ESTILOS PARA FRASES MOTIVACIONALES === */
+        
+        /* Estilos para el modal de motivación */
+        .motivation-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 15px;
+            background-color: var(--color-parchment);
+        }
+
+        .motivation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
+
+        .motivation-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .motivation-text {
+            flex: 1;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .motivation-actions {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .motivation-btn-small {
+            background: none;
+            border: 1px solid var(--color-border);
+            border-radius: 3px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .motivation-btn-small:hover {
+            background-color: var(--color-border);
+        }
+
+        .motivation-btn-small.edit {
+            color: #0066cc;
+        }
+
+        .motivation-btn-small.delete {
+            color: #cc0000;
+        }
+
+        .motivation-btn-small.insert {
+            color: #00aa00;
+        }
+
+        /* Estilo para las frases motivacionales en el diario */
+        .motivation-entry {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f0f8ff; /* Azul claro suave */
+            border-left: 5px solid #4682b4; /* Azul acero */
+            border-radius: 2px;
+            font-family: 'Cormorant Garamond', serif;
+            position: relative;
+        }
+
+        .motivation-hero-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            object-fit: cover;
+            border: 2px solid var(--color-border);
+        }
+
+        .motivation-hero-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .motivation-quote {
+            flex: 1;
+            font-style: italic;
+            color: var(--color-ink);
+            font-size: 16px;
+        }
+
+        .motivation-delete {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .motivation-entry:hover .motivation-delete {
+            opacity: 1;
+        }
+
+        .motivation-delete:hover {
+            background: rgba(255, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        .modal-btn-secondary {
+            background: linear-gradient(145deg, #87ceeb, #b0e0e6);
+            color: #0066cc;
+            border: 2px solid #4682b4;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .modal-btn-secondary:hover {
+            background: linear-gradient(145deg, #b0e0e6, #87ceeb);
+            transform: translateY(-1px);
+        }
+
+        #motivationInput {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        #motivationInput:focus {
+            outline: none;
+            border-color: #4682b4;
+            box-shadow: 0 0 5px rgba(70, 130, 180, 0.3);
+        }
+
+        /* --- Calendar Modal --- */
+
+        .calendar-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calendar-modal.active {
+            display: flex;
+        }
+
+        .calendar-content {
+            background-color: var(--color-parchment);
+            border: 3px solid var(--color-border);
+            border-radius: 5px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .calendar-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.5em;
+            color: var(--color-dark-ink);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .calendar-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-nav-btn {
+            background-color: var(--color-copper);
+            color: white;
+            border: 2px solid var(--color-border);
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Cormorant Garamond', serif;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-nav-btn:hover {
+            background-color: #d4a06b;
+        }
+
+        .calendar-nav-btn:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
+        .calendar-month-year {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--color-ink);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 8px 4px;
+            font-size: 0.9em;
+            color: var(--color-border);
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 8px 4px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            font-family: 'Cormorant Garamond', serif;
+            border: 1px solid transparent;
+        }
+
+        .calendar-day:hover {
+            background-color: var(--color-copper);
+            color: white;
+        }
+
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.disabled:hover {
+            background-color: transparent;
+            color: #ccc;
+        }
+
+        .calendar-day.current {
+            background-color: var(--color-dark-ink);
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--color-copper);
+            font-weight: bold;
+>>>>>>> develop
         }
     </style>
 </head>
 <body>
     <div class="journal-container">
         <header class="journal-header">
-            <!-- Botón de recompensa diaria -->
-            <div class="reward-section" style="text-align:center; margin:15px 0;">
-                <button id="reward-btn" class="gold-btn">💰 Claim 10,000 Gold</button>
+            <!-- Fecha con botón de calendario -->
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px; position: relative;">
+                <h2 id="currentDate" class="date-script">Sunday, October 26, 2025</h2>
+                <button id="calendarBtn" class="calendar-btn" title="Jump to date">📅</button>
             </div>
             
-            <div class="date-navigation">
+            <!-- Todos los botones en la misma fila -->
+            <div class="buttons-row" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                 <button id="prevDay" class="nav-button">◀️ Previous Day</button>
+<<<<<<< HEAD
                 <h2 id="currentDate" class="date-script"></h2>
                 <button id="addImageBtn" class="nav-button" title="Add up to 3 images">🖼️ Add Image</button>
+=======
+                <button id="motivationBtn" class="motivation-btn">💬 Motivation</button>
+                <button id="reward-btn" class="gold-btn">💰 Claim 10,000 Gold</button>
+                <button id="imageBtn" class="image-btn">Image 🖼️</button>
+>>>>>>> develop
                 <button id="nextDay" class="nav-button">Next Day ▶️</button>
             </div>
         </header>
@@ -668,18 +1192,235 @@
 
     <!-- Emoji Picker Popover for Modal -->
     <div id="emojiPickerWrap" class="popover hidden">
-        <emoji-picker id="emojiPicker" locale="en" skin-tone-emoji="👍"></emoji-picker>
+        <emoji-picker id="emojiPicker" locale="en"></emoji-picker>
     </div>
 
     <!-- Emoji Picker Popover for Toolbar -->
     <div id="toolbarEmojiPickerWrap" class="popover hidden">
-        <emoji-picker id="toolbarEmojiPicker" locale="en" skin-tone-emoji="👍"></emoji-picker>
+        <emoji-picker id="toolbarEmojiPicker" locale="en"></emoji-picker>
+    </div>
+
+    <!-- Modal para límite de imágenes -->
+    <div id="imageLimitModal" class="image-limit-modal">
+        <div class="image-limit-content">
+            <h2 class="image-limit-title">Image Limit Reached</h2>
+            <p class="image-limit-message">You can only add a maximum of 3 images per day.</p>
+            <button class="modal-btn modal-btn-save" onclick="closeImageLimitModal()">Understood</button>
+        </div>
+    </div>
+
+    <!-- Modal para Frases Motivacionales -->
+    <div id="motivationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Motivational Phrases Management</h2>
+            
+            <!-- Lista de frases existentes -->
+            <div class="modal-field">
+                <label>Existing Phrases:</label>
+                <div id="motivationList" class="motivation-list">
+                    <!-- Las frases se cargarán aquí dinámicamente -->
+                </div>
+            </div>
+            
+            <!-- Nueva frase -->
+            <div class="modal-field">
+                <label for="motivationInput">New Phrase:</label>
+                <textarea id="motivationInput" placeholder="Write your motivational phrase here..." maxlength="200" rows="3"></textarea>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="addMotivationBtn">Add</button>
+                <button class="modal-btn modal-btn-secondary" id="insertRandomBtn">Insert Random</button>
+                <button class="modal-btn modal-btn-cancel" id="motivationModalCancel">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Calendario -->
+    <div id="calendarModal" class="calendar-modal">
+        <div class="calendar-content">
+            <h2 class="calendar-title">Jump to Date</h2>
+            
+            <!-- Navegación de mes/año -->
+            <div class="calendar-navigation">
+                <button id="calendarPrevMonth" class="calendar-nav-btn">◀</button>
+                <div id="calendarMonthYear" class="calendar-month-year">October 2025</div>
+                <button id="calendarNextMonth" class="calendar-nav-btn">▶</button>
+            </div>
+            
+            <!-- Grid del calendario -->
+            <div id="calendarGrid" class="calendar-grid">
+                <!-- Los días se generarán dinámicamente -->
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="calendarModalCancel">Close</button>
+            </div>
+        </div>
     </div>
 
     <script>
         // ==================================
         //         FUNCTIONALITY (JS)
         // ==================================
+
+        // ========================================
+        // SISTEMA DE SINCRONIZACIÓN CON HABITSCALENDAR.JSON
+        // ========================================
+
+        // Función para recopilar todos los datos del calendario de hábitos desde localStorage
+        function collectHabitsCalendarData() {
+            const habitsData = {
+                diaryEntries: {},
+                diaryImages: {},
+                customEntryButton: JSON.parse(localStorage.getItem('customEntryButton') || '{"emoji":"🧠","text":"Today I Learned"}'),
+                recentColors: JSON.parse(localStorage.getItem('recentColors') || '[]'),
+                dailyRewards: JSON.parse(localStorage.getItem('dailyRewards') || '{}'),
+                motivationalPhrases: JSON.parse(localStorage.getItem('motivationalPhrases') || '[]')
+            };
+
+            // Recopilar todas las entradas del diario
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('diary_')) {
+                    if (key.includes('diary_images_')) {
+                        habitsData.diaryImages[key] = JSON.parse(localStorage.getItem(key) || '[]');
+                    } else {
+                        habitsData.diaryEntries[key] = localStorage.getItem(key);
+                    }
+                }
+            }
+
+            return habitsData;
+        }
+
+        // Función para sincronizar datos del calendario de hábitos con el sistema de guardado
+        function syncHabitsCalendarWithSave() {
+            const habitsData = collectHabitsCalendarData();
+            
+            // Enviar datos al sistema de guardado del juego
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'syncHabitsCalendar',
+                    data: habitsData
+                }, '*');
+            }
+        }
+
+        // Función para cargar datos del calendario de hábitos desde el sistema de guardado
+        function loadHabitsCalendarFromSave(habitsData) {
+            if (!habitsData) return;
+
+            // Cargar entradas del diario
+            if (habitsData.diaryEntries) {
+                Object.keys(habitsData.diaryEntries).forEach(key => {
+                    localStorage.setItem(key, habitsData.diaryEntries[key]);
+                });
+            }
+
+            // Cargar imágenes del diario
+            if (habitsData.diaryImages) {
+                Object.keys(habitsData.diaryImages).forEach(key => {
+                    localStorage.setItem(key, JSON.stringify(habitsData.diaryImages[key]));
+                });
+            }
+
+            // Cargar configuración del botón personalizado
+            if (habitsData.customEntryButton) {
+                localStorage.setItem('customEntryButton', JSON.stringify(habitsData.customEntryButton));
+                updateCustomButton();
+            }
+
+            // Cargar colores recientes
+            if (habitsData.recentColors) {
+                localStorage.setItem('recentColors', JSON.stringify(habitsData.recentColors));
+                renderRecentColors();
+            }
+
+            // Cargar recompensas diarias
+            if (habitsData.dailyRewards) {
+                localStorage.setItem('dailyRewards', JSON.stringify(habitsData.dailyRewards));
+                // Actualizar estado del botón de recompensa
+                updateRewardButtonState();
+            }
+
+            // Cargar frases motivacionales
+            if (habitsData.motivationalPhrases) {
+                localStorage.setItem('motivationalPhrases', JSON.stringify(habitsData.motivationalPhrases));
+                motivationalPhrases = habitsData.motivationalPhrases;
+            }
+        }
+
+        // Función para actualizar el estado del botón de recompensa
+        function updateRewardButtonState() {
+            const rewardBtn = document.getElementById('reward-btn');
+            if (rewardBtn) {
+                const today = new Date().toISOString().split('T')[0];
+                const dailyRewards = JSON.parse(localStorage.getItem('dailyRewards') || '{}');
+                const claimedToday = dailyRewards[today];
+                
+                if (claimedToday) {
+                    rewardBtn.textContent = '💰 Claimed 10,000 Gold';
+                    rewardBtn.disabled = true;
+                } else {
+                    rewardBtn.textContent = '💰 Claim 10,000 Gold';
+                    rewardBtn.disabled = false;
+                }
+            }
+        }
+
+        // Cargar datos desde el sistema de guardado del juego
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'loadData') {
+                if (event.data.diaryEntries) {
+                    // Cargar entradas del diary
+                    Object.keys(event.data.diaryEntries).forEach(key => {
+                        localStorage.setItem(key, event.data.diaryEntries[key]);
+                    });
+                    // Actualizar la vista actual
+                    updateDiaryView();
+                }
+                
+                // Cargar datos del calendario de hábitos si están disponibles
+                if (event.data.habitsCalendarData) {
+                    loadHabitsCalendarFromSave(event.data.habitsCalendarData);
+                    updateDiaryView();
+                }
+            }
+            
+            // Manejar respuestas de operaciones de imágenes
+            if (event.data && event.data.type === 'diary:image-selected') {
+                if (event.data.success && event.data.imagePath) {
+                    currentDayImages.push(event.data.imagePath);
+                    saveCurrentDayImages();
+                    renderDiaryImages();
+                } else if (event.data.error) {
+                    alert('Error adding image: ' + event.data.error);
+                }
+            }
+            
+            if (event.data && event.data.type === 'diary:image-deleted') {
+                if (event.data.success) {
+                    const index = event.data.imageIndex;
+                    if (index >= 0 && index < currentDayImages.length) {
+                        currentDayImages.splice(index, 1);
+                        saveCurrentDayImages();
+                        renderDiaryImages();
+                    }
+                } else if (event.data.error) {
+                    console.error('Error deleting image:', event.data.error);
+                }
+            }
+        });
+
+        // Solicitar datos al cargar
+        if (window.parent) {
+            window.parent.postMessage({ type: 'requestData' }, '*');
+            // También solicitar datos específicos del calendario de hábitos
+            window.parent.postMessage({ type: 'requestHabitsCalendarData' }, '*');
+        }
 
         // Constants for DOM elements
         const currentDateEl = document.getElementById('currentDate');
@@ -716,9 +1457,20 @@
         currentDate.setHours(0, 0, 0, 0); // Normalize to midnight
 
         // Maximum number of recent colors to display
+<<<<<<< HEAD
         const MAX_RECENT_COLORS = 8;
         // Maximum images per diary entry
         const MAX_DIARY_IMAGES = 3;
+=======
+        const MAX_RECENT_COLORS = 5;
+
+        // Variables para manejo de imágenes del diario
+        let currentDayImages = [];
+        const MAX_IMAGES_PER_DAY = 3;
+
+        // Elementos del DOM para imágenes
+        const imageLimitModal = document.getElementById('imageLimitModal');
+>>>>>>> develop
 
         // Preset color palette (2 columns layout)
         const presetColors = [
@@ -729,9 +1481,7 @@
             '#FFD700', // gold
             '#800080', // purple
             '#FFFFFF', // white
-            '#FF8C00', // orange
-            '#A52A2A', // brown
-            '#808080'  // gray
+            '#FF8C00'  // orange
         ];
 
         // --- Utility and Date Functions ---
@@ -832,7 +1582,15 @@
             const content = localStorage.getItem(key) || ''; // Load content or empty
 
             editorEl.innerHTML = content;
+<<<<<<< HEAD
             renderDiaryImages();
+=======
+            
+            // Cargar imágenes del día actual
+            currentDayImages = getCurrentDayImages();
+            renderDiaryImages();
+            
+>>>>>>> develop
             // This ensures the Next Day button is disabled if it's today
             checkNextDayButton();
         }
@@ -844,6 +1602,9 @@
             const key = getStorageKey(currentDate);
             // Use innerHTML to save formatting (bold, italic, etc.)
             localStorage.setItem(key, editorEl.innerHTML);
+            
+            // Sincronizar con habitscalendar.json
+            syncHabitsCalendarWithSave();
         }
 
         // --- Navigation and Events ---
@@ -920,11 +1681,48 @@
          */
         function insertCustomTag() {
             const customConfig = loadCustomButton();
+            
+            // Crear un ID único para esta entrada
+            const entryId = 'learned_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
             editorEl.focus();
-            // Create a special div for CSS styling
-            document.execCommand('insertHTML', false, `<div class="learned-today">${customConfig.emoji} ${customConfig.text}: </div><br>`);
+            
+            // Forzar nueva línea si hay contenido antes del cursor
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                
+                // Obtener el texto antes del cursor en la línea actual
+                const preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(editorEl);
+                preCaretRange.setEnd(range.startContainer, range.startOffset);
+                const textBeforeCursor = preCaretRange.toString();
+                
+                // Si hay texto antes del cursor y no termina con salto de línea
+                if (textBeforeCursor.length > 0 && !textBeforeCursor.endsWith('\n')) {
+                    document.execCommand('insertHTML', false, '<br>');
+                }
+            }
+            
+            // Create a special div for CSS styling with delete button
+            const learnedHtml = `<div class="learned-today" data-entry-id="${entryId}">${customConfig.emoji} ${customConfig.text}: <button class="learned-today-delete" onclick="removeLearnedTodayEntry('${entryId}')" title="Delete">🗑️</button></div><br>`;
+            document.execCommand('insertHTML', false, learnedHtml);
             saveContent();
         }
+
+        // Función global para eliminar entrada "Today I Learned" (llamada desde HTML)
+        window.removeLearnedTodayEntry = function(entryId) {
+            const entry = document.querySelector(`[data-entry-id="${entryId}"]`);
+            if (entry) {
+                // También remover el <br> siguiente si existe
+                const nextElement = entry.nextElementSibling;
+                if (nextElement && nextElement.tagName === 'BR') {
+                    nextElement.remove();
+                }
+                entry.remove();
+                saveContent();
+            }
+        };
 
         // --- Custom Button Management ---
 
@@ -945,6 +1743,9 @@
         function saveCustomButton(emoji, text) {
             localStorage.setItem('customEntryButton', JSON.stringify({ emoji, text }));
             updateCustomButton();
+            
+            // Sincronizar con habitscalendar.json
+            syncHabitsCalendarWithSave();
         }
 
         /**
@@ -988,16 +1789,43 @@
 
         /**
          * Toggles the emoji picker visibility and positions it.
+         * For the modal emoji picker - position to the right and centered.
          */
         function toggleEmojiPicker() {
             emojiPickerWrap.classList.toggle('hidden');
             
             if (!emojiPickerWrap.classList.contains('hidden')) {
-                // Position the popover next to the button
+                // Position the popover to the right of the button and centered
                 const rect = openEmojiPicker.getBoundingClientRect();
                 emojiPickerWrap.style.position = 'fixed';
-                emojiPickerWrap.style.left = `${rect.left}px`;
-                emojiPickerWrap.style.top = `${rect.bottom + 8}px`;
+                emojiPickerWrap.style.zIndex = '99999';
+                emojiPickerWrap.style.transform = 'none';
+                
+                // Position to the right of the button
+                emojiPickerWrap.style.left = `${rect.right + 8}px`;
+                
+                // Center vertically with the button
+                const pickerHeight = 400; // Approximate emoji picker height
+                const buttonHeight = rect.height;
+                const centerOffset = (pickerHeight - buttonHeight) / 2;
+                emojiPickerWrap.style.top = `${rect.top - centerOffset}px`;
+                
+                // Ensure it stays in viewport
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const pickerWidth = 320; // Approximate emoji picker width
+                
+                // Adjust horizontal position if it would go off screen
+                if (rect.right + pickerWidth + 8 > viewportWidth) {
+                    emojiPickerWrap.style.left = `${rect.left - pickerWidth - 8}px`;
+                }
+                
+                // Adjust vertical position if it would go off screen
+                if (rect.top - centerOffset < 0) {
+                    emojiPickerWrap.style.top = '10px';
+                } else if (rect.top - centerOffset + pickerHeight > viewportHeight) {
+                    emojiPickerWrap.style.top = `${viewportHeight - pickerHeight - 10}px`;
+                }
             }
         }
 
@@ -1012,16 +1840,46 @@
 
         /**
          * Toggles the toolbar emoji picker visibility and positions it.
+         * For the main toolbar emoji picker - ALWAYS position below the button.
          */
         function toggleToolbarEmojiPicker() {
             toolbarEmojiPickerWrap.classList.toggle('hidden');
             
             if (!toolbarEmojiPickerWrap.classList.contains('hidden')) {
-                // Position the popover next to the button
+                // Position the popover below the button with fixed positioning
                 const rect = emojiBtn.getBoundingClientRect();
                 toolbarEmojiPickerWrap.style.position = 'fixed';
+                toolbarEmojiPickerWrap.style.zIndex = '99999';
+                toolbarEmojiPickerWrap.style.transform = 'none';
+                
+                // ALWAYS position below the button - no exceptions
                 toolbarEmojiPickerWrap.style.left = `${rect.left}px`;
                 toolbarEmojiPickerWrap.style.top = `${rect.bottom + 8}px`;
+                
+                // Ensure it stays in viewport horizontally
+                const viewportWidth = window.innerWidth;
+                const pickerWidth = 320; // Approximate emoji picker width
+                
+                // Adjust horizontal position if it would go off screen
+                if (rect.left + pickerWidth > viewportWidth) {
+                    toolbarEmojiPickerWrap.style.left = `${viewportWidth - pickerWidth - 10}px`;
+                }
+                
+                // If it would go off screen below, scroll the page to make room
+                const viewportHeight = window.innerHeight;
+                const pickerHeight = 400; // Approximate emoji picker height
+                
+                if (rect.bottom + pickerHeight + 8 > viewportHeight) {
+                    // Scroll down to make room for the picker
+                    const scrollAmount = (rect.bottom + pickerHeight + 8) - viewportHeight + 20;
+                    window.scrollBy(0, scrollAmount);
+                    
+                    // Reposition after scrolling
+                    setTimeout(() => {
+                        const newRect = emojiBtn.getBoundingClientRect();
+                        toolbarEmojiPickerWrap.style.top = `${newRect.bottom + 8}px`;
+                    }, 100);
+                }
             }
         }
 
@@ -1081,6 +1939,9 @@
             
             // Update the display
             renderRecentColors();
+            
+            // Sincronizar con habitscalendar.json
+            syncHabitsCalendarWithSave();
         }
 
         /**
@@ -1124,6 +1985,134 @@
                 });
                 presetColorsContainer.appendChild(swatch);
             });
+        }
+
+        // --- Image Management Functions ---
+
+        /**
+         * Función para cerrar modal de límite de imágenes
+         */
+        function closeImageLimitModal() {
+            imageLimitModal.classList.remove('active');
+        }
+
+        // Hacer la función disponible globalmente para el onclick del HTML
+        window.closeImageLimitModal = closeImageLimitModal;
+
+        /**
+         * Función para obtener imágenes del día actual
+         */
+        function getCurrentDayImages() {
+            const key = `diary_images_${getStorageKey(currentDate)}`;
+            const stored = localStorage.getItem(key);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        /**
+         * Función para guardar imágenes del día actual
+         */
+        function saveCurrentDayImages() {
+            const key = `diary_images_${getStorageKey(currentDate)}`;
+            localStorage.setItem(key, JSON.stringify(currentDayImages));
+            
+            // Sincronizar con habitscalendar.json
+            syncHabitsCalendarWithSave();
+        }
+
+        /**
+         * Función para insertar imagen en el diario
+         */
+        async function insertDiaryImage() {
+            if (currentDayImages.length >= MAX_IMAGES_PER_DAY) {
+                imageLimitModal.classList.add('active');
+                return;
+            }
+
+            try {
+                // Comunicarse con la ventana padre a través de postMessage
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'diary:select-image',
+                        date: currentDate.toISOString(),
+                        imageIndex: currentDayImages.length + 1
+                    }, '*');
+                } else {
+                    alert('Image functionality is only available in the desktop version.');
+                }
+            } catch (error) {
+                console.error('Error requesting image selection:', error);
+                alert('Error requesting image selection');
+            }
+        }
+
+        /**
+         * Función para eliminar imagen del diario
+         */
+        async function deleteDiaryImage(index) {
+            const imagePath = currentDayImages[index];
+            try {
+                // Comunicarse con la ventana padre a través de postMessage
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'diary:delete-image',
+                        imagePath: imagePath,
+                        imageIndex: index
+                    }, '*');
+                } else {
+                    // Fallback para versión web - solo remover de la lista
+                    currentDayImages.splice(index, 1);
+                    saveCurrentDayImages();
+                    renderDiaryImages();
+                }
+            } catch (error) {
+                console.error('Error deleting diary image:', error);
+            }
+        }
+
+        /**
+         * Función para renderizar imágenes en el diario
+         */
+        function renderDiaryImages() {
+            let imagesContainer = document.getElementById('diary-images-container');
+            if (!imagesContainer) {
+                imagesContainer = document.createElement('div');
+                imagesContainer.id = 'diary-images-container';
+                imagesContainer.className = 'diary-images';
+                editorEl.parentNode.insertBefore(imagesContainer, editorEl);
+            }
+
+            imagesContainer.innerHTML = '';
+
+            // Solo mostrar imágenes si hay alguna
+            if (currentDayImages.length > 0) {
+                const imagesRow = document.createElement('div');
+                imagesRow.className = 'diary-images-row';
+
+                currentDayImages.forEach((imagePath, index) => {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'diary-image';
+
+                    const img = document.createElement('img');
+                    img.src = `file://${imagePath}`;
+                    img.alt = `Diary image ${index + 1}`;
+                    img.onerror = () => {
+                        // Si la imagen no se puede cargar, mostrar placeholder
+                        img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+                    };
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'diary-image-delete';
+                    deleteBtn.innerHTML = '🗑️';
+                    deleteBtn.onclick = () => deleteDiaryImage(index);
+                    deleteBtn.title = 'Delete image';
+
+                    imageDiv.appendChild(img);
+                    imageDiv.appendChild(deleteBtn);
+                    imagesRow.appendChild(imageDiv);
+                });
+
+                imagesContainer.appendChild(imagesRow);
+            }
         }
 
         // --- Initialization ---
@@ -1202,6 +2191,9 @@
         settingsBtn.addEventListener('click', openModal);
         emojiBtn.addEventListener('click', toggleToolbarEmojiPicker);
         fontSelector.addEventListener('change', (e) => changeFont(e.target.value));
+        
+        // Event listener para el botón de imagen
+        imageBtn.addEventListener('click', insertDiaryImage);
 
         // 4. Event Listeners for modal
         modalSave.addEventListener('click', saveModal);
@@ -1210,6 +2202,14 @@
             // Close modal if clicking outside the content
             if (e.target === customModal) {
                 closeModal();
+            }
+        });
+
+        // Event listener para cerrar modal de límite de imágenes
+        imageLimitModal.addEventListener('click', (e) => {
+            // Close modal if clicking outside the content
+            if (e.target === imageLimitModal) {
+                closeImageLimitModal();
             }
         });
 
@@ -1225,6 +2225,51 @@
             }
             if (!emojiBtn.contains(e.target) && !toolbarEmojiPickerWrap.contains(e.target)) {
                 toolbarEmojiPickerWrap.classList.add('hidden');
+            }
+        });
+
+        // Reposition emoji pickers on scroll to keep them fixed
+        window.addEventListener('scroll', () => {
+            if (!emojiPickerWrap.classList.contains('hidden')) {
+                // Reposition modal emoji picker (to the right and centered)
+                const rect = openEmojiPicker.getBoundingClientRect();
+                emojiPickerWrap.style.left = `${rect.right + 8}px`;
+                
+                const pickerHeight = 400;
+                const buttonHeight = rect.height;
+                const centerOffset = (pickerHeight - buttonHeight) / 2;
+                emojiPickerWrap.style.top = `${rect.top - centerOffset}px`;
+                
+                // Viewport adjustments
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const pickerWidth = 320;
+                
+                if (rect.right + pickerWidth + 8 > viewportWidth) {
+                    emojiPickerWrap.style.left = `${rect.left - pickerWidth - 8}px`;
+                }
+                if (rect.top - centerOffset < 0) {
+                    emojiPickerWrap.style.top = '10px';
+                } else if (rect.top - centerOffset + pickerHeight > viewportHeight) {
+                    emojiPickerWrap.style.top = `${viewportHeight - pickerHeight - 10}px`;
+                }
+            }
+            if (!toolbarEmojiPickerWrap.classList.contains('hidden')) {
+                // Reposition toolbar emoji picker (ALWAYS below the button)
+                const rect = emojiBtn.getBoundingClientRect();
+                toolbarEmojiPickerWrap.style.left = `${rect.left}px`;
+                toolbarEmojiPickerWrap.style.top = `${rect.bottom + 8}px`;
+                
+                // Viewport adjustments
+                const viewportWidth = window.innerWidth;
+                const pickerWidth = 320;
+                
+                if (rect.left + pickerWidth > viewportWidth) {
+                    toolbarEmojiPickerWrap.style.left = `${viewportWidth - pickerWidth - 10}px`;
+                }
+                
+                // No vertical adjustments - always keep it below the button
+                // The picker will be visible even if it goes off screen
             }
         });
 
@@ -1246,6 +2291,12 @@
 
         // 7. Ensure Next button is properly disabled at startup
         checkNextDayButton();
+        
+        // 8. Sincronización inicial con habitscalendar.json
+        // Permitir tiempo para que se carguen los datos del juego antes de sincronizar
+        setTimeout(() => {
+            syncHabitsCalendarWithSave();
+        }, 1000);
 
         // 8. Botón de recompensa diaria
         const rewardBtn = document.getElementById('reward-btn');
@@ -1275,9 +2326,560 @@
                     // Actualizar el botón
                     rewardBtn.textContent = '💰 Claimed 10,000 Gold';
                     rewardBtn.disabled = true;
+                    
+                    // Sincronizar con habitscalendar.json
+                    syncHabitsCalendarWithSave();
                 };
             }
         }
+
+        // ========================================
+        // SISTEMA DE FRASES MOTIVACIONALES
+        // ========================================
+
+        const motivationModal = document.getElementById('motivationModal');
+        const motivationBtn = document.getElementById('motivationBtn');
+        const motivationInput = document.getElementById('motivationInput');
+        const motivationList = document.getElementById('motivationList');
+        const addMotivationBtn = document.getElementById('addMotivationBtn');
+        const insertRandomBtn = document.getElementById('insertRandomBtn');
+        const motivationModalCancel = document.getElementById('motivationModalCancel');
+
+        let motivationalPhrases = [];
+        let currentlyEditingIndex = -1;
+        let heroesData = null; // Para almacenar datos de héroes del juego
+
+        // Cargar frases desde localStorage
+        function loadMotivationalPhrases() {
+            const saved = localStorage.getItem('motivationalPhrases');
+            motivationalPhrases = saved ? JSON.parse(saved) : [
+                "Every day is a new opportunity to grow.",
+                "Your potential is infinite, you just need to discover it.",
+                "Small daily steps lead to great transformations.",
+                "You are stronger than you think, more capable than you imagine.",
+                "Success is not the destination, it's the journey of personal growth.",
+                "Every challenge is a disguised opportunity to prove your worth."
+            ];
+            saveMotivationalPhrases();
+        }
+
+        // Guardar frases en localStorage
+        function saveMotivationalPhrases() {
+            localStorage.setItem('motivationalPhrases', JSON.stringify(motivationalPhrases));
+            
+            // Sincronizar con habitscalendar.json
+            syncHabitsCalendarWithSave();
+        }
+
+        // Renderizar lista de frases en el modal
+        function renderMotivationList() {
+            motivationList.innerHTML = '';
+            
+            if (motivationalPhrases.length === 0) {
+                motivationList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">No motivational phrases saved</div>';
+                return;
+            }
+            
+            motivationalPhrases.forEach((phrase, index) => {
+                const item = document.createElement('div');
+                item.className = 'motivation-item';
+                
+                const text = document.createElement('div');
+                text.className = 'motivation-text';
+                text.textContent = phrase;
+                
+                const actions = document.createElement('div');
+                actions.className = 'motivation-actions';
+                
+                const editBtn = document.createElement('button');
+                editBtn.className = 'motivation-btn-small edit';
+                editBtn.textContent = '✏️';
+                editBtn.title = 'Edit';
+                editBtn.onclick = () => editMotivation(index);
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'motivation-btn-small delete';
+                deleteBtn.textContent = '🗑️';
+                deleteBtn.title = 'Delete';
+                deleteBtn.onclick = () => deleteMotivation(index);
+                
+                const insertBtn = document.createElement('button');
+                insertBtn.className = 'motivation-btn-small insert';
+                insertBtn.textContent = '➕';
+                insertBtn.title = 'Insert in diary';
+                insertBtn.onclick = () => insertMotivationToEditor(phrase);
+                
+                actions.appendChild(editBtn);
+                actions.appendChild(deleteBtn);
+                actions.appendChild(insertBtn);
+                
+                item.appendChild(text);
+                item.appendChild(actions);
+                motivationList.appendChild(item);
+            });
+        }
+
+        // Obtener héroe aleatorio con imágenes
+        function getRandomHeroWithImages() {
+            // Si tenemos datos de héroes del juego, usar uno aleatorio
+            if (heroesData && heroesData.length > 0) {
+                const randomIndex = Math.floor(Math.random() * heroesData.length);
+                return heroesData[randomIndex];
+            }
+            
+            // Datos de fallback
+            return {
+                name: "Hero",
+                avatar: "../Population/DefaultAvatar.png",
+                secondImg: null,
+                ability1Img: null,
+                ability2Img: null
+            };
+        }
+
+        // Insertar frase motivacional en el editor
+        function insertMotivationToEditor(phrase) {
+            const hero = getRandomHeroWithImages();
+            
+            // Crear un ID único para esta entrada motivacional
+            const entryId = 'motivation_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            editorEl.focus();
+            
+            // Forzar nueva línea si hay contenido antes del cursor
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                
+                // Obtener el texto antes del cursor en la línea actual
+                const preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(editorEl);
+                preCaretRange.setEnd(range.startContainer, range.startOffset);
+                const textBeforeCursor = preCaretRange.toString();
+                
+                // Si hay texto antes del cursor y no termina con salto de línea
+                if (textBeforeCursor.length > 0 && !textBeforeCursor.endsWith('\n')) {
+                    document.execCommand('insertHTML', false, '<br>');
+                }
+            }
+            
+            // Crear el HTML para la entrada motivacional
+            const motivationHtml = `
+                <div class="motivation-entry" data-entry-id="${entryId}">
+                    <img class="motivation-hero-avatar" src="${hero.avatar || '../Population/DefaultAvatar.png'}" alt="${hero.name || 'Hero'}" onerror="this.src='../Population/DefaultAvatar.png'" data-hero-name="${hero.name || 'Hero'}">
+                    <div class="motivation-quote">"${phrase}"</div>
+                    <button class="motivation-delete" onclick="removeMotivationEntry('${entryId}')" title="Delete">🗑️</button>
+                </div><br>
+            `;
+            
+            document.execCommand('insertHTML', false, motivationHtml);
+            
+            // Configurar el ciclo de imágenes para la imagen insertada
+            setTimeout(() => {
+                setupHeroImageCycle(entryId, hero);
+            }, 100);
+            
+            saveContent();
+            closeMotivationModal();
+        }
+
+        // Configurar el ciclo de imágenes para un héroe específico
+        function setupHeroImageCycle(entryId, hero) {
+            const entry = document.querySelector(`[data-entry-id="${entryId}"]`);
+            if (!entry) return;
+            
+            const img = entry.querySelector('.motivation-hero-avatar');
+            if (!img || img.availableImages) return; // Ya configurado
+            
+            // Crear array de imágenes disponibles
+            const availableImages = [];
+            
+            if (hero.avatar) {
+                availableImages.push({ src: hero.avatar, name: 'Avatar' });
+            } else {
+                availableImages.push({ src: '../Population/DefaultAvatar.png', name: 'Avatar' });
+            }
+            
+            if (hero.secondImg) {
+                availableImages.push({ src: hero.secondImg, name: '2nd Image' });
+            }
+            
+            if (hero.ability1Img) {
+                availableImages.push({ src: hero.ability1Img, name: 'Ability 1' });
+            }
+            
+            if (hero.ability2Img) {
+                availableImages.push({ src: hero.ability2Img, name: 'Ability 2' });
+            }
+            
+            // Configurar propiedades del ciclo
+            img.currentImageIndex = 0;
+            img.availableImages = availableImages;
+            
+            // Agregar evento de clic para ciclar imágenes
+            img.addEventListener('click', function() {
+                if (this.availableImages.length > 1) {
+                    this.currentImageIndex = (this.currentImageIndex + 1) % this.availableImages.length;
+                    const newImage = this.availableImages[this.currentImageIndex];
+                    this.src = newImage.src;
+                    this.onerror = () => this.src = '../Population/DefaultAvatar.png';
+                    console.log(`${this.dataset.heroName}: Cambiando a ${newImage.name}`);
+                    saveContent();
+                }
+            });
+        }
+
+        // Función global para eliminar entrada motivacional (llamada desde HTML)
+        window.removeMotivationEntry = function(entryId) {
+            const entry = document.querySelector(`[data-entry-id="${entryId}"]`);
+            if (entry) {
+                // También remover el <br> siguiente si existe
+                const nextElement = entry.nextElementSibling;
+                if (nextElement && nextElement.tagName === 'BR') {
+                    nextElement.remove();
+                }
+                entry.remove();
+                saveContent();
+            }
+        };
+
+        // Abrir modal de motivación
+        function openMotivationModal() {
+            loadMotivationalPhrases();
+            renderMotivationList();
+            motivationModal.classList.add('active');
+            
+            // Solicitar datos de héroes si no los tenemos
+            if (!heroesData && window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'requestHeroesDataForMotivation' }, '*');
+            }
+        }
+
+        // Cerrar modal de motivación
+        function closeMotivationModal() {
+            motivationModal.classList.remove('active');
+            motivationInput.value = '';
+            currentlyEditingIndex = -1;
+            addMotivationBtn.textContent = 'Agregar';
+        }
+
+        // Agregar nueva frase
+        function addMotivation() {
+            const phrase = motivationInput.value.trim();
+            if (!phrase) {
+                alert('Please, write a motivational phrase.');
+                return;
+            }
+            
+            if (phrase.length > 200) {
+                alert('The phrase is too long. Maximum 200 characters.');
+                return;
+            }
+            
+            if (currentlyEditingIndex >= 0) {
+                // Editando frase existente
+                motivationalPhrases[currentlyEditingIndex] = phrase;
+                currentlyEditingIndex = -1;
+                addMotivationBtn.textContent = 'Add';
+            } else {
+                // Agregando nueva frase
+                motivationalPhrases.push(phrase);
+            }
+            
+            saveMotivationalPhrases();
+            renderMotivationList();
+            motivationInput.value = '';
+        }
+
+        // Editar frase existente
+        function editMotivation(index) {
+            motivationInput.value = motivationalPhrases[index];
+            currentlyEditingIndex = index;
+            addMotivationBtn.textContent = 'Update';
+            motivationInput.focus();
+        }
+
+        // Eliminar frase
+        function deleteMotivation(index) {
+            if (confirm('Are you sure you want to delete this phrase?')) {
+                motivationalPhrases.splice(index, 1);
+                saveMotivationalPhrases();
+                renderMotivationList();
+                
+                // Si estábamos editando esta frase, cancelar edición
+                if (currentlyEditingIndex === index) {
+                    motivationInput.value = '';
+                    currentlyEditingIndex = -1;
+                    addMotivationBtn.textContent = 'Add';
+                } else if (currentlyEditingIndex > index) {
+                    currentlyEditingIndex--;
+                }
+            }
+        }
+
+        // Insertar frase aleatoria
+        function insertRandomMotivation() {
+            if (motivationalPhrases.length === 0) {
+                alert('No motivational phrases available. Add some first.');
+                return;
+            }
+            
+            const randomPhrase = motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
+            insertMotivationToEditor(randomPhrase);
+        }
+
+        // Event Listeners para frases motivacionales
+        if (motivationBtn) motivationBtn.addEventListener('click', openMotivationModal);
+        if (motivationModalCancel) motivationModalCancel.addEventListener('click', closeMotivationModal);
+        if (addMotivationBtn) addMotivationBtn.addEventListener('click', addMotivation);
+        if (insertRandomBtn) insertRandomBtn.addEventListener('click', insertRandomMotivation);
+
+        // Permitir agregar frase con Enter en textarea
+        if (motivationInput) {
+            motivationInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    addMotivation();
+                }
+            });
+        }
+
+        // Cerrar modal al hacer clic fuera
+        if (motivationModal) {
+            motivationModal.addEventListener('click', (e) => {
+                if (e.target === motivationModal) {
+                    closeMotivationModal();
+                }
+            });
+        }
+
+        // Expandir el listener de mensajes existente para manejar datos de héroes
+        window.addEventListener('message', (event) => {
+            // ... el código de mensajes existente se mantiene ...
+            
+            // Manejar datos de héroes para frases motivacionales
+            if (event.data && event.data.type === 'heroesDataForMotivation') {
+                heroesData = event.data.heroes;
+                console.log('Datos de héroes recibidos para frases motivacionales:', heroesData?.length || 0, 'héroes');
+            }
+        });
+
+        // Reconfigurar ciclos de imágenes al cargar contenido guardado
+        function reconfigureExistingMotivationEntries() {
+            setTimeout(() => {
+                const existingEntries = document.querySelectorAll('.motivation-entry[data-entry-id]');
+                existingEntries.forEach(entry => {
+                    const img = entry.querySelector('.motivation-hero-avatar');
+                    if (img && !img.availableImages) {
+                        // Crear un héroe básico basado en la imagen actual
+                        const heroData = {
+                            name: img.dataset.heroName || 'Hero',
+                            avatar: img.src,
+                            secondImg: null,
+                            ability1Img: null,
+                            ability2Img: null
+                        };
+                        
+                        setupHeroImageCycle(entry.dataset.entryId, heroData);
+                    }
+                });
+            }, 500);
+        }
+
+        // Reconfigurar entradas "Today I Learned" existentes para agregar botones de eliminación
+        function reconfigureExistingLearnedTodayEntries() {
+            setTimeout(() => {
+                const existingEntries = document.querySelectorAll('.learned-today:not([data-entry-id])');
+                existingEntries.forEach(entry => {
+                    // Crear un ID único para esta entrada existente
+                    const entryId = 'learned_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    entry.setAttribute('data-entry-id', entryId);
+                    
+                    // Verificar si ya tiene botón de eliminación
+                    if (!entry.querySelector('.learned-today-delete')) {
+                        // Agregar botón de eliminación
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'learned-today-delete';
+                        deleteBtn.innerHTML = '🗑️';
+                        deleteBtn.title = 'Delete';
+                        deleteBtn.onclick = () => removeLearnedTodayEntry(entryId);
+                        entry.appendChild(deleteBtn);
+                    }
+                });
+            }, 500);
+        }
+
+        // Inicializar sistema de frases motivacionales
+        loadMotivationalPhrases();
+        
+        // Reconfigurar entradas existentes cuando el contenido se cargue
+        document.addEventListener('DOMContentLoaded', () => {
+            reconfigureExistingMotivationEntries();
+            reconfigureExistingLearnedTodayEntries();
+        });
+        
+        // También reconfigurar cuando cambiemos de día
+        const originalUpdateDiaryView = updateDiaryView;
+        if (typeof updateDiaryView === 'function') {
+            updateDiaryView = function() {
+                originalUpdateDiaryView.apply(this, arguments);
+                reconfigureExistingMotivationEntries();
+                reconfigureExistingLearnedTodayEntries();
+            };
+        }
+
+        // ========================================
+        // SISTEMA DE CALENDARIO
+        // ========================================
+
+        const calendarModal = document.getElementById('calendarModal');
+        const calendarBtn = document.getElementById('calendarBtn');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const calendarMonthYear = document.getElementById('calendarMonthYear');
+        const calendarPrevMonth = document.getElementById('calendarPrevMonth');
+        const calendarNextMonth = document.getElementById('calendarNextMonth');
+        const calendarModalCancel = document.getElementById('calendarModalCancel');
+
+        let calendarCurrentMonth = 9; // Octubre (0-based)
+        let calendarCurrentYear = 2025;
+        const minDate = new Date(2025, 9, 1); // 1 de octubre de 2025
+
+        // Abrir modal de calendario
+        function openCalendarModal() {
+            calendarCurrentMonth = currentDate.getMonth();
+            calendarCurrentYear = currentDate.getFullYear();
+            renderCalendar();
+            calendarModal.classList.add('active');
+        }
+
+        // Cerrar modal de calendario
+        function closeCalendarModal() {
+            calendarModal.classList.remove('active');
+        }
+
+        // Renderizar calendario
+        function renderCalendar() {
+            const firstDay = new Date(calendarCurrentYear, calendarCurrentMonth, 1);
+            const lastDay = new Date(calendarCurrentYear, calendarCurrentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+            const realToday = new Date();
+            realToday.setHours(0, 0, 0, 0);
+
+            // Actualizar título mes/año
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            calendarMonthYear.textContent = `${monthNames[calendarCurrentMonth]} ${calendarCurrentYear}`;
+
+            // Limpiar grid
+            calendarGrid.innerHTML = '';
+
+            // Headers de días de la semana
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                calendarGrid.appendChild(header);
+            });
+
+            // Espacios vacíos antes del primer día
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day disabled';
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            // Días del mes
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+
+                const cellDate = new Date(calendarCurrentYear, calendarCurrentMonth, day);
+                
+                // Verificar si la fecha está deshabilitada (antes del 1 de octubre O después del día actual)
+                if (cellDate < minDate || cellDate > realToday) {
+                    dayElement.classList.add('disabled');
+                } else {
+                    // Marcar día actual
+                    if (cellDate.getTime() === currentDate.getTime()) {
+                        dayElement.classList.add('current');
+                    }
+
+                    // Marcar día de hoy
+                    if (cellDate.getTime() === realToday.getTime()) {
+                        dayElement.classList.add('today');
+                    }
+
+                    // Agregar evento de clic
+                    dayElement.addEventListener('click', () => {
+                        goToDate(cellDate);
+                    });
+                }
+
+                calendarGrid.appendChild(dayElement);
+            }
+
+            // Verificar si los botones de navegación deben estar deshabilitados
+            const prevMonth = new Date(calendarCurrentYear, calendarCurrentMonth - 1, 1);
+            calendarPrevMonth.disabled = prevMonth < minDate;
+
+            const nextMonth = new Date(calendarCurrentYear, calendarCurrentMonth + 1, 1);
+            const realTodayMonth = new Date(realToday.getFullYear(), realToday.getMonth(), 1);
+            calendarNextMonth.disabled = nextMonth > realTodayMonth;
+        }
+
+        // Ir a una fecha específica
+        function goToDate(date) {
+            saveContent(); // Guardar contenido actual
+            currentDate = new Date(date);
+            updateDiaryView();
+            closeCalendarModal();
+        }
+
+        // Navegar a mes anterior
+        function goToPreviousMonth() {
+            calendarCurrentMonth--;
+            if (calendarCurrentMonth < 0) {
+                calendarCurrentMonth = 11;
+                calendarCurrentYear--;
+            }
+            renderCalendar();
+        }
+
+        // Navegar a mes siguiente
+        function goToNextMonth() {
+            calendarCurrentMonth++;
+            if (calendarCurrentMonth > 11) {
+                calendarCurrentMonth = 0;
+                calendarCurrentYear++;
+            }
+            renderCalendar();
+        }
+
+        // Event Listeners para el calendario
+        if (calendarBtn) calendarBtn.addEventListener('click', openCalendarModal);
+        if (calendarModalCancel) calendarModalCancel.addEventListener('click', closeCalendarModal);
+        if (calendarPrevMonth) calendarPrevMonth.addEventListener('click', goToPreviousMonth);
+        if (calendarNextMonth) calendarNextMonth.addEventListener('click', goToNextMonth);
+
+        // Cerrar modal al hacer clic fuera
+        if (calendarModal) {
+            calendarModal.addEventListener('click', (e) => {
+                if (e.target === calendarModal) {
+                    closeCalendarModal();
+                }
+            });
+        }
+
+        // ========================================
+        // FIN SISTEMA DE CALENDARIO
+        // ========================================
+
+        // ========================================
+        // FIN SISTEMA DE FRASES MOTIVACIONALES
+        // ========================================
     </script>
 </body>
 </html>

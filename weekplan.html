@@ -1093,6 +1093,24 @@
         // STATE AND CONFIGURATION
         // ================================
 
+        // Cargar datos desde el sistema de guardado del juego
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'loadData') {
+                if (event.data.weekplanEvents) {
+                    // Cargar eventos del weekplan
+                    localStorage.setItem('weekPlanEvents', JSON.stringify(event.data.weekplanEvents));
+                    // Recargar eventos y actualizar vista
+                    events = loadEvents();
+                    renderCalendar();
+                }
+            }
+        });
+
+        // Solicitar datos al cargar
+        if (window.parent) {
+            window.parent.postMessage({ type: 'requestData' }, '*');
+        }
+
         const HOURS = Array.from({ length: 24 }, (_, i) => i);
         const HOURS_TO_SHOW = 8;
         const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -1397,10 +1415,16 @@
 
             // Render all events
             events.forEach(event => {
-                // Check if event is in current week
-                const eventDate = new Date(event.date);
-                
-                if (eventDate < currentWeekStart || eventDate >= weekEnd) {
+                // Check if event is in current week - FIX para problemas de zona horaria
+                const eventDateStr = event.date;
+                const weekDates = [];
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(currentWeekStart);
+                    date.setDate(date.getDate() + i);
+                    weekDates.push(date.toISOString().split('T')[0]);
+                }
+
+                if (!weekDates.includes(eventDateStr)) {
                     return;
                 }
 
@@ -1883,7 +1907,7 @@
             const newEvent = {
                 ...event,
                 id: generateId(),
-                title: event.title + ' (copia)'
+                title: event.title
             };
             
             // Desplazar 1 hora hacia abajo
@@ -2350,8 +2374,8 @@
 
         async function deleteEventById(eventId) {
             const confirmed = await showCustomConfirm(
-                '¿Estás seguro de que quieres eliminar este evento?',
-                'Eliminar Evento',
+                'Are you sure you want to delete this event?',
+                'Delete Event',
                 '🗡️'
             );
             

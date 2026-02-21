@@ -445,6 +445,45 @@ async function generateProjectsFile(projectsData) {
   }
 }
 
+// Función para generar archivo diary.json
+async function generateDiaryFile(diaryData) {
+  try {
+    const diaryPath = path.join(SAVE_DIR, 'diary.json');
+    await fs.writeFile(diaryPath, JSON.stringify(diaryData, null, 2), 'utf-8');
+    logger.info('✅ Archivo diary.json generado en:', diaryPath);
+    return diaryData;
+  } catch (error) {
+    logger.error('❌ Error al generar diary.json:', error);
+    return {};
+  }
+}
+
+// Función para generar archivo weekplan.json
+async function generateWeekplanFile(weekplanData) {
+  try {
+    const weekplanPath = path.join(SAVE_DIR, 'weekplan.json');
+    await fs.writeFile(weekplanPath, JSON.stringify(weekplanData, null, 2), 'utf-8');
+    logger.info('✅ Archivo weekplan.json generado en:', weekplanPath);
+    return weekplanData;
+  } catch (error) {
+    logger.error('❌ Error al generar weekplan.json:', error);
+    return {};
+  }
+}
+
+// Función para generar archivo habitscalendar.json
+async function generateHabitsCalendarFile(habitsCalendarData) {
+  try {
+    const habitsCalendarPath = path.join(SAVE_DIR, 'habitscalendar.json');
+    await fs.writeFile(habitsCalendarPath, JSON.stringify(habitsCalendarData, null, 2), 'utf-8');
+    logger.info('✅ Archivo habitscalendar.json generado en:', habitsCalendarPath);
+    return habitsCalendarData;
+  } catch (error) {
+    logger.error('❌ Error al generar habitscalendar.json:', error);
+    return {};
+  }
+}
+
 async function ensureSaveDir() {
   try {
     await fs.mkdir(SAVE_DIR, { recursive: true });
@@ -501,16 +540,29 @@ async function saveGame(data) {
       }
     }
     
+<<<<<<< HEAD
     // Generar partner.json y partner_abilities.json
     if (data.partner) {
       await generatePartnerFile(data.partner, data.partnerStats, chiefId);
       await generatePartnerAbilitiesFile(data.villageChief || {});
     }
+=======
+    // Generar villains.json - COMENTADO
+    // if (data.villains && Array.isArray(data.villains)) {
+    //   await generateVillainsFile(data.villains, chiefId);
+    // }
     
-    // Generar familiars.json
-    if (data.villageChief && data.villageChief.familiars && Array.isArray(data.villageChief.familiars)) {
-      await generateFamiliarsFile(data.villageChief.familiars, chiefId);
-    }
+    // Generar partner.json y partner_abilities.json - COMENTADO
+    // if (data.partner) {
+    //   await generatePartnerFile(data.partner, data.partnerStats, chiefId);
+    //   await generatePartnerAbilitiesFile(data.villageChief || {});
+    // }
+>>>>>>> develop
+    
+    // Generar familiars.json - COMENTADO
+    // if (data.villageChief && data.villageChief.familiars && Array.isArray(data.villageChief.familiars)) {
+    //   await generateFamiliarsFile(data.villageChief.familiars, chiefId);
+    // }
     
     // Generar Elites.json
     if (data.Elites && Array.isArray(data.Elites)) {
@@ -540,6 +592,23 @@ async function saveGame(data) {
     await generateProjectsFile({
       projects: data.projects,
       projectPoints: data.projectPoints
+    });
+    
+    // Generar diary.json (siempre se genera para mantener consistencia)
+    await generateDiaryFile({
+      diaryEntries: data.diaryEntries || {}
+    });
+    
+    // Generar weekplan.json (siempre se genera para mantener consistencia)
+    await generateWeekplanFile({
+      events: data.weekplanEvents || []
+    });
+    
+    // Generar habitscalendar.json (siempre se genera para mantener consistencia)
+    await generateHabitsCalendarFile({
+      habitsData: data.habitsData || {},
+      habitsMonth: data.habitsMonth || `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`,
+      habitsLastProcessed: data.habitsLastProcessed || new Date().toISOString().split('T')[0]
     });
     
     logger.info('✅ Archivos JSON generados correctamente');
@@ -585,6 +654,57 @@ async function loadProjects() {
   }
 }
 
+async function loadDiary() {
+  try {
+    const diaryPath = path.join(SAVE_DIR, 'diary.json');
+    const data = await fs.readFile(diaryPath, 'utf-8');
+    const diaryData = JSON.parse(data);
+    logger.info('✅ Diary cargado desde:', diaryPath);
+    return diaryData.diaryEntries || {};
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      logger.warn('⚠️ diary.json no encontrado, usando datos vacíos');
+      return {};
+    }
+    logger.error('❌ Error al cargar diary.json:', error);
+    return {};
+  }
+}
+
+async function loadWeekplan() {
+  try {
+    const weekplanPath = path.join(SAVE_DIR, 'weekplan.json');
+    const data = await fs.readFile(weekplanPath, 'utf-8');
+    const weekplanData = JSON.parse(data);
+    logger.info('✅ Weekplan cargado desde:', weekplanPath);
+    return weekplanData.events || [];
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      logger.warn('⚠️ weekplan.json no encontrado, usando datos vacíos');
+      return [];
+    }
+    logger.error('❌ Error al cargar weekplan.json:', error);
+    return [];
+  }
+}
+
+async function loadHabitsCalendar() {
+  try {
+    const habitsCalendarPath = path.join(SAVE_DIR, 'habitscalendar.json');
+    const data = await fs.readFile(habitsCalendarPath, 'utf-8');
+    const habitsCalendarData = JSON.parse(data);
+    logger.info('✅ HabitsCalendar cargado desde:', habitsCalendarPath);
+    return habitsCalendarData;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      logger.warn('⚠️ habitscalendar.json no encontrado, usando datos vacíos');
+      return {};
+    }
+    logger.error('❌ Error al cargar habitscalendar.json:', error);
+    return {};
+  }
+}
+
 async function loadGame(defaultData = {}) {
   try {
     await migrateLegacySave();
@@ -614,6 +734,35 @@ async function loadGame(defaultData = {}) {
       }
     }
     
+    // Intentar cargar diary.json como respaldo si los datos no están en save.json
+    if (!gameData.diaryEntries) {
+      const diaryData = await loadDiary();
+      if (diaryData && Object.keys(diaryData).length > 0) {
+        gameData.diaryEntries = diaryData;
+        logger.info('✅ Datos de Diary restaurados desde diary.json');
+      }
+    }
+    
+    // Intentar cargar weekplan.json como respaldo si los datos no están en save.json
+    if (!gameData.weekplanEvents) {
+      const weekplanData = await loadWeekplan();
+      if (weekplanData && Array.isArray(weekplanData)) {
+        gameData.weekplanEvents = weekplanData;
+        logger.info('✅ Datos de Weekplan restaurados desde weekplan.json');
+      }
+    }
+    
+    // Intentar cargar habitscalendar.json como respaldo si los datos no están en save.json
+    if (!gameData.habitsData) {
+      const habitsCalendarData = await loadHabitsCalendar();
+      if (habitsCalendarData && Object.keys(habitsCalendarData).length > 0) {
+        gameData.habitsData = habitsCalendarData.habitsData || {};
+        gameData.habitsMonth = habitsCalendarData.habitsMonth || `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+        gameData.habitsLastProcessed = habitsCalendarData.habitsLastProcessed || new Date().toISOString().split('T')[0];
+        logger.info('✅ Datos de HabitsCalendar restaurados desde habitscalendar.json');
+      }
+    }
+    
     // Validar que projects sea siempre un array
     if (!Array.isArray(gameData.projects)) {
       logger.warn('⚠️ gameData.projects no es un array, corrigiendo a array vacío');
@@ -625,12 +774,50 @@ async function loadGame(defaultData = {}) {
       gameData.projectPoints = 0;
     }
     
+    // Asegurar que diaryEntries exista
+    if (!gameData.diaryEntries) {
+      gameData.diaryEntries = {};
+    }
+    
+    // Asegurar que weekplanEvents exista
+    if (!gameData.weekplanEvents) {
+      gameData.weekplanEvents = [];
+    }
+    
+    // Asegurar que los datos del calendario de hábitos existan
+    if (!gameData.habitsData) {
+      gameData.habitsData = {};
+    }
+    if (!gameData.habitsMonth) {
+      gameData.habitsMonth = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+    }
+    if (!gameData.habitsLastProcessed) {
+      gameData.habitsLastProcessed = new Date().toISOString().split('T')[0];
+    }
+    
     return gameData;
   } catch (error) {
     if (error.code === 'ENOENT') {
-      logger.warn('⚠️ No se encontró save.json. Usando datos por defecto (NO se carga partida0 automáticamente).');
-      // NO cargar partida0.json automáticamente - solo cuando el usuario hace reset explícito
-      return defaultData;
+      logger.warn('⚠️ No se encontró save.json. Intentando cargar partida0.json automáticamente...');
+      
+      // Intentar cargar partida0.json automáticamente
+      try {
+        const partida0Path = path.join(__dirname, '../../partida0.json');
+        const partida0Content = await fs.readFile(partida0Path, 'utf-8');
+        const partida0Data = JSON.parse(partida0Content);
+        
+        logger.info('✅ partida0.json cargado correctamente como datos iniciales');
+        
+        // Guardar automáticamente como save.json para futuras sesiones
+        await saveGame(partida0Data);
+        logger.info('📁 Datos de partida0.json guardados como save.json para próximas sesiones');
+        
+        return partida0Data;
+      } catch (partida0Error) {
+        logger.error('❌ Error al cargar partida0.json:', partida0Error.message);
+        logger.warn('⚠️ Usando datos por defecto como último recurso');
+        return defaultData;
+      }
     } else {
       logger.error('❌ Error al cargar partida:', error);
       if (error.name === 'SyntaxError') {
@@ -638,15 +825,30 @@ async function loadGame(defaultData = {}) {
           const corrupt = SAVE_FILE_PATH + '.corrupt';
           await fs.rename(SAVE_FILE_PATH, corrupt);
           logger.warn('⚠️ Archivo de guardado corrupto renombrado a:', corrupt);
-          logger.warn('⚠️ Usar Reset para cargar partida0.json o importar un backup manual.');
+          logger.warn('⚠️ Intentando cargar partida0.json como respaldo...');
+          
+          // Intentar cargar partida0.json como respaldo para archivos corruptos
+          try {
+            const partida0Path = path.join(__dirname, '../../partida0.json');
+            const partida0Content = await fs.readFile(partida0Path, 'utf-8');
+            const partida0Data = JSON.parse(partida0Content);
+            
+            logger.info('✅ partida0.json cargado como respaldo después de archivo corrupto');
+            
+            // Guardar automáticamente como save.json
+            await saveGame(partida0Data);
+            logger.info('📁 Datos de partida0.json guardados como nuevo save.json');
+            
+            return partida0Data;
+          } catch (partida0Error) {
+            logger.error('❌ Error al cargar partida0.json como respaldo:', partida0Error.message);
+          }
         } catch (renameErr) {
           logger.error('❌ Error al renombrar archivo corrupto:', renameErr);
         }
       }
       
-      // NO cargar partida0.json automáticamente tras un error
-      // El usuario debe hacer reset explícito si quiere comenzar de nuevo
-      logger.warn('⚠️ No se cargará partida0.json automáticamente. Use Reset o importe un backup.');
+      logger.warn('⚠️ Usando datos por defecto como último recurso');
       return defaultData;
     }
   }
@@ -663,19 +865,67 @@ async function deleteSave() {
   }
 }
 
+// Función auxiliar para limpiar archivos adicionales durante el reset
+async function cleanAdditionalFiles() {
+  const filesToClean = [
+    'lifemissions.json',
+    'diary.json', 
+    'weekplan.json',
+    'habitscalendar.json',
+    'projects.json'
+  ];
+  
+  const cleanResults = [];
+  
+  for (const fileName of filesToClean) {
+    try {
+      const filePath = path.join(SAVE_DIR, fileName);
+      await fs.unlink(filePath);
+      logger.info(`🧹 ${fileName} eliminado correctamente`);
+      cleanResults.push({ file: fileName, success: true });
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        logger.info(`ℹ️ ${fileName} no existía, no necesita limpieza`);
+        cleanResults.push({ file: fileName, success: true, notFound: true });
+      } else {
+        logger.warn(`⚠️ Error al eliminar ${fileName}:`, error.message);
+        cleanResults.push({ file: fileName, success: false, error: error.message }); 
+      }
+    }
+  }
+  
+  return cleanResults;
+}
+
 async function resetToPartida0() {
   try {
-    // Leer el contenido de partida0.json
+    logger.info('🔄 Iniciando reset completo del juego...');
+    
+    // Paso 1: Limpiar archivos adicionales
+    logger.info('🧹 Limpiando archivos adicionales...');
+    const cleanResults = await cleanAdditionalFiles();
+    const cleanedFiles = cleanResults.filter(r => r.success).length;
+    const totalFiles = cleanResults.length;
+    logger.info(`✅ Limpieza completada: ${cleanedFiles}/${totalFiles} archivos procesados correctamente`);
+    
+    // Paso 2: Leer el contenido de partida0.json
+    logger.info('📖 Cargando datos iniciales desde partida0.json...');
     const partida0Path = path.join(__dirname, '../../partida0.json');
     const partida0Content = await fs.readFile(partida0Path, 'utf-8');
     const partida0Data = JSON.parse(partida0Content);
     
-    // Guardar esos datos en save.json usando la función saveGame existente
+    // Paso 3: Guardar esos datos en save.json usando la función saveGame existente
+    logger.info('💾 Guardando datos iniciales como save.json...');
     await saveGame(partida0Data);
-    logger.info('🔄 Reset completado: partida0.json copiado a save.json');
+    
+    logger.info('🎉 Reset completado exitosamente:');
+    logger.info('   📁 partida0.json → save.json');
+    logger.info('   🧹 Archivos adicionales limpiados');
+    logger.info('   🎮 Juego listo para empezar desde cero');
+    
     return true;
   } catch (error) {
-    logger.error('❌ Error al resetear a partida0:', error);
+    logger.error('❌ Error durante el reset:', error);
     return false;
   }
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚔️ Medieval Project Management</title>
-    <script type="module" src="https://unpkg.com/emoji-picker-element@^1/index.js"></script>
+    <script type="module" src="assets/js/emoji-picker-element/index.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600&display=swap');
         
@@ -1356,8 +1356,27 @@
     </div>
 
     <script>
+        // Cargar datos desde el sistema de guardado del juego
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'loadData') {
+                if (event.data.projects) {
+                    // Cargar proyectos usando la clave del sistema principal
+                    localStorage.setItem('syw_projects_v1', JSON.stringify(event.data.projects));
+                    localStorage.setItem('medievalProjects', JSON.stringify(event.data.projects));
+                    // Recargar proyectos y actualizar vista
+                    projects = event.data.projects;
+                    renderProjects();
+                }
+            }
+        });
+
+        // Solicitar datos al cargar
+        if (window.parent) {
+            window.parent.postMessage({ type: 'requestData' }, '*');
+        }
+
         // Application state
-        let projects = JSON.parse(localStorage.getItem('medievalProjects')) || [];
+        let projects = JSON.parse(localStorage.getItem('syw_projects_v1')) || JSON.parse(localStorage.getItem('medievalProjects')) || [];
         let draggedTask = null;
         let draggedTaskProject = null;
         let currentView = 'expanded'; // 'expanded' or 'compact'
@@ -2254,7 +2273,23 @@
 
         // Storage
         function saveToLocalStorage() {
+            // Guardar en localStorage con la clave que usa el sistema principal
+            localStorage.setItem('syw_projects_v1', JSON.stringify(projects));
+            
+            // También mantener compatibilidad con la clave anterior
             localStorage.setItem('medievalProjects', JSON.stringify(projects));
+            
+            // Notificar al sistema principal que los proyectos han cambiado
+            if (window.parent && window.parent !== window) {
+                try {
+                    window.parent.postMessage({
+                        type: 'projectsUpdated',
+                        projects: projects
+                    }, '*');
+                } catch (e) {
+                    console.log('No se pudo notificar al sistema principal:', e);
+                }
+            }
         }
 
         // Export / Import

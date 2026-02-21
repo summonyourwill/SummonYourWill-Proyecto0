@@ -98,12 +98,7 @@ export function createHero(heroes, name, origin = "No origin", profession = "", 
     lastTimeShown: 0,
     trainTime: 0,
     trainingStat: null,
-    skills: [
-      { name: "Basic Attack", img: "" },
-      { name: "Special Attack", img: "" },
-      { name: "none", img: "" },
-      { name: "none", img: "" },
-    ],
+    // skills array eliminado - ahora se usan ability1/ability2 directamente
     pet: "",
     petImg: "",
     petLevel: 1,

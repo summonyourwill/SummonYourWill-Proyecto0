@@ -43,7 +43,6 @@ export function renderVillage() {
       ["\u{1F357}", `FoodStor\n${lvl("Pantry")}`],
       ["\u{1FAB5}", `WoodStor\n${lvl("Lumberyard")}`],
       ["\u{1FAA8}", `StoneStor\n${lvl("Quarry")}`],
-      ["\u{1F5FC}", `Tower\n${lvl("Tower")}`],
       ["\u{1F3F0}", `Castle\n${lvl("Castle")}`],
       ["\u{1F4B0}", `Dungeon\n${lvl("Dungeons")}`],
       // Edificios ocultos (posiciones 9-16) - Pueden volver a usarse en el futuro
@@ -169,7 +168,6 @@ export function renderVillage() {
   ensureUpgradeButton("Pantry", "FoodStorage");
   ensureUpgradeButton("Lumberyard", "WoodStorage");
   ensureUpgradeButton("Quarry", "StoneStorage");
-  ensureUpgradeButton("Tower", "Tower");
   ensureUpgradeButton("Castle", "Castle");
   ensureUpgradeButton("Dungeons", "Dungeons");
   // Botones de upgrade ocultos - Pueden volver a usarse en el futuro

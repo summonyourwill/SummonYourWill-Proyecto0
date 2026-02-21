@@ -282,7 +282,7 @@ export function assignHeroToSlot(slotId, heroId) {
   if (hero.professions && hero.professions.some(p => p.toLowerCase() === 'builder')) {
     durationMs /= 2;
   }
-  hero.energia = 0;
+  hero.energia = 1;
   requestSave();
   const slot = slots.find(s => s.slotId === slotId);
   slot.assignedHeroId = id;
@@ -346,7 +346,7 @@ export function openImproveModal(slotId) {
   title.textContent = 'Choose Construction to Improve';
   modal.appendChild(title);
 
-  const hiddenBuildings = ['ArcheryField', 'Ashram', 'BoxingRing', 'FortuneTotem', 'Gym', 'Hospital', 'LifeAltar', 'MageAcademy'];
+  const hiddenBuildings = ['ArcheryField', 'Ashram', 'BoxingRing', 'FortuneTotem', 'Gym', 'Hospital', 'LifeAltar', 'MageAcademy', 'Tower'];
   const buildings = Object.keys(state.buildingLevels || {})
     .filter(name => name !== 'Castle' && !hiddenBuildings.includes(name))
     .sort((a,b)=>displayBuildingName(a).localeCompare(displayBuildingName(b), undefined, {sensitivity:'base'}));
@@ -412,6 +412,10 @@ function showMessage(message) {
 
 export function confirmImprove(slotId, buildingName) {
   try {
+    // Obtener el héroe asignado antes de resetear el slot
+    const slot = slots.find(s => s.slotId === slotId);
+    const assignedHero = slot && slot.assignedHeroId ? state.heroMap.get(slot.assignedHeroId) : null;
+    
     let message;
     if (buildingName === 'Houses') {
       if (state.houses >= MAX_HOUSES) {
@@ -424,7 +428,19 @@ export function confirmImprove(slotId, buildingName) {
       const lvl = levelUp(buildingName);
       message = `Improved ${displayBuildingName(buildingName)} to level ${lvl}`;
     }
+    
     resetSlot(slotId);
+    
+    // Si hay un héroe asignado y tiene poca energía, ponerlo a descansar automáticamente
+    if (assignedHero && assignedHero.energia <= 1) {
+      // Importar las funciones de descanso del script principal
+      import('../script.js').then(m => {
+        if (m.autoStartRest) {
+          m.autoStartRest(assignedHero);
+        }
+      }).catch(() => {});
+    }
+    
     renderSection();
     showMessage(message);
   } catch (err) {

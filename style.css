@@ -455,6 +455,7 @@ body.loading .content section {
   height: 240px;
   max-width: none;
   max-height: none;
+  object-fit: fill;
   border-radius: 12px;
   border: 2px solid #d4af37;
 }
@@ -489,6 +490,7 @@ body.loading .content section {
   padding: 12px 28px;
   font-size: 16px;
   font-weight: bold;
+  font-family: 'Cinzel', serif;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -2514,6 +2516,10 @@ section h1::before {
   margin: 10px auto 0;
   padding: 8px 16px;
 }
+
+.fortune-result {
+  padding-bottom: 10px;
+}
 .enemy-game-container {
   display: flex;
   justify-content: center;
@@ -2612,7 +2618,7 @@ section h1::before {
 }
 
 #build-house-card {
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   padding-bottom: 10px;
 }
 
@@ -2623,7 +2629,7 @@ section h1::before {
 
 @media (max-width: 1000px) {
   #build-house-card {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -2635,7 +2641,7 @@ section h1::before {
 
 #village-overview-card {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 0;
   padding: 10px 5px;
   width: 100%;
@@ -2643,7 +2649,7 @@ section h1::before {
 
 @media (max-width: 1000px) {
   #village-overview-card {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -3059,6 +3065,65 @@ section h1::before {
   line-height: 1em;
   pointer-events: none;
 }
+
+/* Hero Peek Styles */
+.hero-peek {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: scale(0.8) translate(2px, 2px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.hero-peek img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transition: transform 0.1s ease;
+}
+
+.hero-peek img:hover {
+  transform: scale(1.05);
+}
+
+.hero-peek img:active {
+  transform: scale(0.95);
+}
+
+.calendar-day:hover .hero-peek {
+  opacity: 1;
+  transform: scale(1) translate(0, 0);
+  pointer-events: auto;
+}
+
+/* Ajustar daily-stats para hacer espacio al hero peek cuando sea necesario */
+.calendar-day.has-hero-peek .daily-stats {
+  right: 36px; /* Hacer espacio para el peek del héroe más grande */
+}
+
+/* Estilos para efecto de confeti en LifeMissions */
+.task {
+  position: relative; /* Necesario para posicionar el confeti */
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 1000;
+}
 .icon-row {
   display: flex;
   justify-content: space-around;
@@ -3180,17 +3245,17 @@ section h1::before {
   height: 320px;
   max-width: none;
   max-height: none;
-  background-size: contain;
+  background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .ability-image {
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
   max-width: none;
   max-height: none;
-  object-fit: cover;
+  object-fit: fill;
 }
 
 .partner-slot {
