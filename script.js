@@ -148,6 +148,8 @@ import { openConfirm } from './ui/modals.js';
 
 import { isSectionVisible, showHeroSelector } from "./ui/villageControls.js";
 
+import { renderPagination, getPaginationParamsFromUrl, setPaginationParamsInUrl } from './ui/pagination.js';
+
 import { UI_PERF_FLAG, initUIPerf } from './performance/uiPerf.js';
 
 export {
@@ -955,6 +957,12 @@ let villainFilterFavorites = false;
 let villainFilterSearch = null;
 
 let currentPetPage = 1;
+
+let heroPageSize = 10;
+
+let villainPageSize = 10;
+
+let petPageSize = 10;
 
 let petSort = "name";
 
@@ -6177,7 +6185,7 @@ function showAddPetPopup() {
 
     const totalPets = state.heroes.filter(h => h.pet).length;
 
-    const pages = Math.max(1, Math.ceil(totalPets / PETS_PER_PAGE));
+    const pages = Math.max(1, Math.ceil(totalPets / petPageSize));
 
     if (currentPetPage > pages) currentPetPage = pages;
 
@@ -20677,13 +20685,13 @@ export function renderHeroes() {
 
   });
 
-  const heroPages = Math.max(1, Math.ceil(sortedHeroes.length / HEROES_PER_PAGE));
+  const heroPages = Math.max(1, Math.ceil(sortedHeroes.length / heroPageSize));
 
   if (currentHeroPage > heroPages) currentHeroPage = heroPages;
 
-  const start = (currentHeroPage - 1) * HEROES_PER_PAGE;
+  const start = (currentHeroPage - 1) * heroPageSize;
 
-  const pageHeroes = sortedHeroes.slice(start, start + HEROES_PER_PAGE);
+  const pageHeroes = sortedHeroes.slice(start, start + heroPageSize);
 
   const fragment = document.createDocumentFragment();
 
@@ -22908,31 +22916,37 @@ export function renderHeroes() {
 
   if (pagination) {
 
-    const prev = document.createElement("button");
+    renderPagination(pagination, {
 
-    prev.textContent = "Prev";
+      page: currentHeroPage,
 
-    prev.disabled = currentHeroPage === 1;
+      totalPages: heroPages,
 
-    prev.onclick = () => { if (currentHeroPage > 1) { currentHeroPage--; scheduleRenderHeroes(); } };
+      pageSize: heroPageSize,
 
-    const info = document.createElement("span");
+      onPageChange(n) {
 
-    info.textContent = ` Page ${currentHeroPage} of ${heroPages} `;
+        currentHeroPage = n;
 
-    const next = document.createElement("button");
+        setPaginationParamsInUrl(n, heroPageSize);
 
-    next.textContent = "Next";
+        scheduleRenderHeroes();
 
-    next.disabled = currentHeroPage === heroPages;
+      },
 
-    next.onclick = () => { if (currentHeroPage < heroPages) { currentHeroPage++; scheduleRenderHeroes(); } };
+      onPageSizeChange(newSize) {
 
-    pagination.appendChild(prev);
+        heroPageSize = newSize;
 
-    pagination.appendChild(info);
+        currentHeroPage = 1;
 
-    pagination.appendChild(next);
+        setPaginationParamsInUrl(1, heroPageSize);
+
+        scheduleRenderHeroes();
+
+      }
+
+    });
 
   }
 
@@ -22998,13 +23012,13 @@ function renderVillains() {
 
   });
 
-  const villainPages = Math.max(1, Math.ceil(sorted.length / VILLAINS_PER_PAGE));
+  const villainPages = Math.max(1, Math.ceil(sorted.length / villainPageSize));
 
   if (currentVillainPage > villainPages) currentVillainPage = villainPages;
 
-  const start = (currentVillainPage - 1) * VILLAINS_PER_PAGE;
+  const start = (currentVillainPage - 1) * villainPageSize;
 
-  const pageList = sorted.slice(start, start + VILLAINS_PER_PAGE);
+  const pageList = sorted.slice(start, start + villainPageSize);
 
 
 
@@ -23356,31 +23370,37 @@ function renderVillains() {
 
   if (pagination) {
 
-    const prev = document.createElement("button");
+    renderPagination(pagination, {
 
-    prev.textContent = "Prev";
+      page: currentVillainPage,
 
-    prev.disabled = currentVillainPage === 1;
+      totalPages: villainPages,
 
-    prev.onclick = () => { if (currentVillainPage > 1) { currentVillainPage--; renderVillains(); } };
+      pageSize: villainPageSize,
 
-    const info = document.createElement("span");
+      onPageChange(n) {
 
-    info.textContent = ` Page ${currentVillainPage} of ${villainPages} `;
+        currentVillainPage = n;
 
-    const next = document.createElement("button");
+        setPaginationParamsInUrl(n, villainPageSize);
 
-    next.textContent = "Next";
+        renderVillains();
 
-    next.disabled = currentVillainPage === villainPages;
+      },
 
-    next.onclick = () => { if (currentVillainPage < villainPages) { currentVillainPage++; renderVillains(); } };
+      onPageSizeChange(newSize) {
 
-    pagination.appendChild(prev);
+        villainPageSize = newSize;
 
-    pagination.appendChild(info);
+        currentVillainPage = 1;
 
-    pagination.appendChild(next);
+        setPaginationParamsInUrl(1, villainPageSize);
+
+        renderVillains();
+
+      }
+
+    });
 
   }
 
@@ -23444,13 +23464,13 @@ function renderPets() {
 
   });
 
-  const petPages = Math.max(1, Math.ceil(sorted.length / PETS_PER_PAGE));
+  const petPages = Math.max(1, Math.ceil(sorted.length / petPageSize));
 
   if (currentPetPage > petPages) currentPetPage = petPages;
 
-  const start = (currentPetPage - 1) * PETS_PER_PAGE;
+  const start = (currentPetPage - 1) * petPageSize;
 
-  const pagePets = sorted.slice(start, start + PETS_PER_PAGE);
+  const pagePets = sorted.slice(start, start + petPageSize);
 
 
 
@@ -23844,31 +23864,37 @@ function renderPets() {
 
   if (pagination) {
 
-    const prev = document.createElement("button");
+    renderPagination(pagination, {
 
-    prev.textContent = "Prev";
+      page: currentPetPage,
 
-    prev.disabled = currentPetPage === 1;
+      totalPages: petPages,
 
-    prev.onclick = () => { if (currentPetPage > 1) { currentPetPage--; renderPets(); } };
+      pageSize: petPageSize,
 
-    const info = document.createElement("span");
+      onPageChange(n) {
 
-    info.textContent = ` Page ${currentPetPage} of ${petPages} `;
+        currentPetPage = n;
 
-    const next = document.createElement("button");
+        setPaginationParamsInUrl(n, petPageSize);
 
-    next.textContent = "Next";
+        renderPets();
 
-    next.disabled = currentPetPage === petPages;
+      },
 
-    next.onclick = () => { if (currentPetPage < petPages) { currentPetPage++; renderPets(); } };
+      onPageSizeChange(newSize) {
 
-    pagination.appendChild(prev);
+        petPageSize = newSize;
 
-    pagination.appendChild(info);
+        currentPetPage = 1;
 
-    pagination.appendChild(next);
+        setPaginationParamsInUrl(1, petPageSize);
+
+        renderPets();
+
+      }
+
+    });
 
   }
 
@@ -28355,7 +28381,19 @@ async function init() {
 
   initializeStateData();
 
-  
+  const urlPag = getPaginationParamsFromUrl();
+
+  currentHeroPage = urlPag.page;
+
+  currentVillainPage = urlPag.page;
+
+  currentPetPage = urlPag.page;
+
+  heroPageSize = urlPag.pageSize;
+
+  villainPageSize = urlPag.pageSize;
+
+  petPageSize = urlPag.pageSize;
 
   // Ahora que el estado está inicializado, verificar todas las misiones
 

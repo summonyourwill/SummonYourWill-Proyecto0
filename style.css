@@ -1665,6 +1665,25 @@ div#upgrade-timer-Hospital.timer {
   cursor: not-allowed;
 }
 
+.pagination-size-wrap {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.pagination-size-label {
+  font-size: 14px;
+  color: #495057;
+}
+
+.pagination-size-select {
+  margin-left: 6px;
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
 .chief-command-card {
   background: #fff;
   border-radius: 12px;
