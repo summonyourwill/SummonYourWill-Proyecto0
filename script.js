@@ -3011,7 +3011,7 @@ let partnerAbilityPage = 1;
 
 let chiefFamiliarPageSize = 10;
 
-let chiefHabilityPageSize = 10;
+let chiefHabilityPageSize = 4;
 
 let partnerAbilityPageSize = 10;
 
@@ -10473,16 +10473,6 @@ function renderVillageChief() {
     onPageChange(n) {
 
       chiefHabilityPage = n;
-
-      renderVillageChief();
-
-    },
-
-    onPageSizeChange(newSize) {
-
-      chiefHabilityPageSize = newSize;
-
-      chiefHabilityPage = 1;
 
       renderVillageChief();
 
