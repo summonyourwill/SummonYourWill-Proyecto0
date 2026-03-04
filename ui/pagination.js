@@ -94,6 +94,48 @@ export function renderPagination(container, { page, totalPages, pageSize, onPage
   if (page < totalPages) nextBtn.addEventListener('click', () => onPageChange(page + 1));
   bar.appendChild(nextBtn);
 
+  // Go to page (input + Ir button)
+  const gotoWrap = document.createElement('div');
+  gotoWrap.className = 'pagination-goto';
+  const gotoId = 'pagination-goto-' + Math.random().toString(36).slice(2, 9);
+  const gotoLabel = document.createElement('label');
+  gotoLabel.className = 'pagination-goto-label visually-hidden';
+  gotoLabel.setAttribute('for', gotoId);
+  gotoLabel.textContent = 'Go to page';
+  const gotoInput = document.createElement('input');
+  gotoInput.id = gotoId;
+  gotoInput.type = 'number';
+  gotoInput.min = 1;
+  gotoInput.max = Math.max(1, totalPages);
+  gotoInput.className = 'pagination-goto-input';
+  gotoInput.setAttribute('aria-label', 'Go to page');
+  gotoInput.placeholder = totalPages > 0 ? '#' : '';
+  const gotoBtn = document.createElement('button');
+  gotoBtn.type = 'button';
+  gotoBtn.className = 'pagination-btn pagination-goto-btn';
+  gotoBtn.textContent = 'Ir';
+  gotoBtn.setAttribute('aria-label', 'Go to page');
+  const applyGoto = () => {
+    const raw = gotoInput.value.trim();
+    if (raw === '') return;
+    let n = parseInt(raw, 10);
+    if (Number.isNaN(n)) return;
+    if (n < 1) n = 1;
+    if (n > totalPages) n = totalPages;
+    onPageChange(n);
+  };
+  gotoBtn.addEventListener('click', applyGoto);
+  gotoInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      applyGoto();
+    }
+  });
+  gotoWrap.appendChild(gotoLabel);
+  gotoWrap.appendChild(gotoInput);
+  gotoWrap.appendChild(gotoBtn);
+  bar.appendChild(gotoWrap);
+
   container.appendChild(bar);
 
   // Page size selector (optional)

@@ -3009,6 +3009,12 @@ let chiefHabilityPage = 1;
 
 let partnerAbilityPage = 1;
 
+let chiefFamiliarPageSize = 10;
+
+let chiefHabilityPageSize = 10;
+
+let partnerAbilityPageSize = 10;
+
 let autoClickLastTick = Date.now();
 
 let hiddenSince = null;
@@ -9750,13 +9756,13 @@ function renderVillageChief() {
 
   });
 
-  const famPages = CHIEF_MAX_PAGES;
+  const famPages = Math.max(1, Math.ceil(famList.length / chiefFamiliarPageSize));
 
   if (chiefFamiliarPage > famPages) chiefFamiliarPage = famPages;
 
-  const famStart = (chiefFamiliarPage - 1) * CHIEF_ITEMS_PER_PAGE;
+  const famStart = (chiefFamiliarPage - 1) * chiefFamiliarPageSize;
 
-  famList = famList.slice(famStart, famStart + CHIEF_ITEMS_PER_PAGE);
+  famList = famList.slice(famStart, famStart + chiefFamiliarPageSize);
 
   famList.forEach((fam, idx) => {
 
@@ -10024,55 +10030,35 @@ function renderVillageChief() {
 
   const famPag = document.createElement("div");
 
-  famPag.className = "pagination";
+  famDiv.appendChild(famPag);
 
-  const famPrev = document.createElement("button");
+  renderPagination(famPag, {
 
-  famPrev.textContent = "Prev";
+    page: chiefFamiliarPage,
 
-  famPrev.disabled = chiefFamiliarPage === 1;
+    totalPages: famPages,
 
-  famPrev.onclick = () => {
+    pageSize: chiefFamiliarPageSize,
 
-    if (chiefFamiliarPage > 1) {
+    onPageChange(n) {
 
-      chiefFamiliarPage--;
+      chiefFamiliarPage = n;
+
+      renderVillageChief();
+
+    },
+
+    onPageSizeChange(newSize) {
+
+      chiefFamiliarPageSize = newSize;
+
+      chiefFamiliarPage = 1;
 
       renderVillageChief();
 
     }
 
-  };
-
-  famPag.appendChild(famPrev);
-
-  const famInfo = document.createElement("span");
-
-  famInfo.textContent = ` Page ${chiefFamiliarPage} of ${famPages} `;
-
-  famPag.appendChild(famInfo);
-
-  const famNext = document.createElement("button");
-
-  famNext.textContent = "Next";
-
-  famNext.disabled = chiefFamiliarPage === famPages;
-
-  famNext.onclick = () => {
-
-    if (chiefFamiliarPage < famPages) {
-
-      chiefFamiliarPage++;
-
-      renderVillageChief();
-
-    }
-
-  };
-
-  famPag.appendChild(famNext);
-
-    famDiv.appendChild(famPag);
+  });
 
     card.appendChild(famDiv);
 
@@ -10190,13 +10176,13 @@ function renderVillageChief() {
 
   });
 
-  const habPages = CHIEF_MAX_PAGES;
+  const habPages = Math.max(1, Math.ceil(habList.length / chiefHabilityPageSize));
 
   if (chiefHabilityPage > habPages) chiefHabilityPage = habPages;
 
-  const habStart = (chiefHabilityPage - 1) * CHIEF_ITEMS_PER_PAGE;
+  const habStart = (chiefHabilityPage - 1) * chiefHabilityPageSize;
 
-  habList = habList.slice(habStart, habStart + CHIEF_ITEMS_PER_PAGE);
+  habList = habList.slice(habStart, habStart + chiefHabilityPageSize);
 
   habList.forEach((hab, idx) => {
 
@@ -10474,55 +10460,35 @@ function renderVillageChief() {
 
   const habPag = document.createElement("div");
 
-  habPag.className = "pagination";
-
-  const habPrev = document.createElement("button");
-
-  habPrev.textContent = "Prev";
-
-  habPrev.disabled = chiefHabilityPage === 1;
-
-  habPrev.onclick = () => {
-
-    if (chiefHabilityPage > 1) {
-
-      chiefHabilityPage--;
-
-      renderVillageChief();
-
-    }
-
-  };
-
-  habPag.appendChild(habPrev);
-
-  const habInfo = document.createElement("span");
-
-  habInfo.textContent = ` Page ${chiefHabilityPage} of ${habPages} `;
-
-  habPag.appendChild(habInfo);
-
-  const habNext = document.createElement("button");
-
-  habNext.textContent = "Next";
-
-  habNext.disabled = chiefHabilityPage === habPages;
-
-  habNext.onclick = () => {
-
-    if (chiefHabilityPage < habPages) {
-
-      chiefHabilityPage++;
-
-      renderVillageChief();
-
-    }
-
-  };
-
-  habPag.appendChild(habNext);
-
   habDiv.appendChild(habPag);
+
+  renderPagination(habPag, {
+
+    page: chiefHabilityPage,
+
+    totalPages: habPages,
+
+    pageSize: chiefHabilityPageSize,
+
+    onPageChange(n) {
+
+      chiefHabilityPage = n;
+
+      renderVillageChief();
+
+    },
+
+    onPageSizeChange(newSize) {
+
+      chiefHabilityPageSize = newSize;
+
+      chiefHabilityPage = 1;
+
+      renderVillageChief();
+
+    }
+
+  });
 
   card.appendChild(habDiv);
 
@@ -10602,13 +10568,13 @@ function renderVillageChief() {
 
   });
 
-  const partPages = PARTNER_MAX_PAGES;
+  const partPages = Math.max(1, Math.ceil(partList.length / partnerAbilityPageSize));
 
   if (partnerAbilityPage > partPages) partnerAbilityPage = partPages;
 
-  const partStart = (partnerAbilityPage - 1) * PARTNER_ITEMS_PER_PAGE;
+  const partStart = (partnerAbilityPage - 1) * partnerAbilityPageSize;
 
-  partList = partList.slice(partStart, partStart + PARTNER_ITEMS_PER_PAGE);
+  partList = partList.slice(partStart, partStart + partnerAbilityPageSize);
 
   partList.forEach((ab,idx)=>{
 
@@ -10786,37 +10752,37 @@ function renderVillageChief() {
 
   partnerDiv.appendChild(partWrapper);
 
-  const partPag=document.createElement('div');
-
-  partPag.className='pagination';
-
-  const partPrev=document.createElement('button');
-
-  partPrev.textContent='Prev';
-
-  partPrev.disabled=partnerAbilityPage===1;
-
-  partPrev.onclick=()=>{ if(partnerAbilityPage>1){ partnerAbilityPage--; renderVillageChief(); } };
-
-  partPag.appendChild(partPrev);
-
-  const partInfo=document.createElement('span');
-
-  partInfo.textContent=` Page ${partnerAbilityPage} of ${partPages} `;
-
-  partPag.appendChild(partInfo);
-
-  const partNext=document.createElement('button');
-
-  partNext.textContent='Next';
-
-  partNext.disabled=partnerAbilityPage===partPages;
-
-  partNext.onclick=()=>{ if(partnerAbilityPage<partPages){ partnerAbilityPage++; renderVillageChief(); } };
-
-  partPag.appendChild(partNext);
+  const partPag = document.createElement('div');
 
   partnerDiv.appendChild(partPag);
+
+  renderPagination(partPag, {
+
+    page: partnerAbilityPage,
+
+    totalPages: partPages,
+
+    pageSize: partnerAbilityPageSize,
+
+    onPageChange(n) {
+
+      partnerAbilityPage = n;
+
+      renderVillageChief();
+
+    },
+
+    onPageSizeChange(newSize) {
+
+      partnerAbilityPageSize = newSize;
+
+      partnerAbilityPage = 1;
+
+      renderVillageChief();
+
+    }
+
+  });
 
   card.appendChild(partnerDiv);
 
@@ -30487,41 +30453,37 @@ function renderPartnerAbilitiesSection(container) {
 
   partnerDiv.appendChild(partWrapper);
 
-  
-
-  const partPag=document.createElement('div');
-
-  partPag.className='pagination';
-
-  const partPrev=document.createElement('button');
-
-  partPrev.textContent='Prev';
-
-  partPrev.disabled=partnerAbilityPage===1;
-
-  partPrev.onclick=()=>{ if(partnerAbilityPage>1){ partnerAbilityPage--; renderPartnersInDiv(container); } };
-
-  partPag.appendChild(partPrev);
-
-  const partInfo=document.createElement('span');
-
-  partInfo.textContent=` Page ${partnerAbilityPage} of ${partPages} `;
-
-  partPag.appendChild(partInfo);
-
-  const partNext=document.createElement('button');
-
-  partNext.textContent='Next';
-
-  partNext.disabled=partnerAbilityPage===partPages;
-
-  partNext.onclick=()=>{ if(partnerAbilityPage<partPages){ partnerAbilityPage++; renderPartnersInDiv(container); } };
-
-  partPag.appendChild(partNext);
+  const partPag = document.createElement('div');
 
   partnerDiv.appendChild(partPag);
 
-  
+  renderPagination(partPag, {
+
+    page: partnerAbilityPage,
+
+    totalPages: partPages,
+
+    pageSize: partnerAbilityPageSize,
+
+    onPageChange(n) {
+
+      partnerAbilityPage = n;
+
+      renderPartnersInDiv(container);
+
+    },
+
+    onPageSizeChange(newSize) {
+
+      partnerAbilityPageSize = newSize;
+
+      partnerAbilityPage = 1;
+
+      renderPartnersInDiv(container);
+
+    }
+
+  });
 
   container.appendChild(partnerDiv);
 
